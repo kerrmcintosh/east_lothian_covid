@@ -1,0 +1,80 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(plotly)
+library(lubridate)
+library(sf)
+```
+
+```{r}
+el_data <- read_csv("data/trend_iz_20210112.csv", col_types = cols(CrudeRate7DayPositive = col_character(), Positive7Day = col_integer()))
+```
+
+```{r}
+colnames(el_data)
+```
+
+```{r}
+unique(el_data$CrudeRate7DayPositiveQF)
+```
+
+```{r}
+el_data <- el_data %>% 
+  filter(CAName == "East Lothian") %>% 
+  mutate(Date = ymd(as.character(Date)))
+head(el_data)
+
+unique(el_data$Date)
+```
+```{r}
+el_data %>%  write_csv("el_check.csv")
+```
+
+Generate shape map with Scotland intermediate zones 
+```{r}
+map <- read_sf("data/shape_files/SG_IntermediateZoneBdry_2011/SG_IntermediateZone_Bdry_2011.shp")
+
+
+mapz <- st_read("data/shape_files/SG_IntermediateZoneBdry_2011/SG_IntermediateZone_Bdry_2011.shp") %>% 
+ filter(grepl("S020",InterZone))
+
+mapz %>%  write_csv("spatial.csv")
+head(mapz)
+```
+
+```{r}
+library(leaflet)
+leaflet(options = leafletOptions(preferCanvas = TRUE)) %>%
+      addTiles() %>%
+      setView(lng = -4.0, lat = 57.0, zoom = 7) %>%
+      addProviderTiles("MapBox", options = tileOptions(
+        updateWhenZooming = FALSE, 
+        updateWhenIdle = TRUE,
+        minZoom = 4, maxZoom = 6)) %>%
+      addPolygons(
+        data = mapz)
+
+# ggplot(data = mapz) +
+#     geom_sf()
+```
+
+```{r}
+# el_line <- ggplotly(
+# el_data %>%
+#     ggplot() +
+#     aes(x = Date, y = Positive7DayQF, colour = IntZoneName) +
+#     geom_line() +
+#     theme_classic() +
+#     theme(legend.title = element_blank(), legend.text = element_text(size = 7)) +
+#     labs(y = "Average Search Rank", x ="") +
+#     guides(colour = guide_legend(title="Search Term")) )
+#     # scale_fill_viridis())
+# # el_line <- el_line %>% layout(legend = list(orientation = 'h', x = 0.05, y = -0.1))
+# el_line
+
+```
+
