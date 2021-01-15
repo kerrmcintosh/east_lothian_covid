@@ -46,7 +46,7 @@ tooltip_css <- "background-color:#9c9a98;"
 
 gg <- ggplot(el_map) +
   geom_sf_interactive(aes(fill = CrudeRate7DayPositive, 
-                          tooltip = c(paste0(IntZoneName, "\n",real_rate_per_OT,  " infections per 100,000 \n (Actual rate over previous 7 days) \n", Positive7Day, " infections in last 7 days \n", abs(wow), " ",change)),  
+                          tooltip = c(paste0(IntZoneName, "\n",real_rate_per_OT,  " infections per 100,000 \n (Actual rate over previous 7 days) \n", Positive7Day, " infections in last 7 days \n(", abs(wow), " ",change,")")),  
                           data_id = IntZoneName)) +
   scale_fill_brewer(palette = "Purples") +
   theme_void() +
@@ -63,3 +63,23 @@ map <- girafe_options(map,
                     opts_tooltip(css = tooltip_css),
                     opts_sizing(rescale = TRUE, width = .7))
 if( interactive() ) print(map)
+
+#---------------------------------------------------------------------------
+###### PLOT 2
+#---------------------------------------------------------------------------
+
+county_data <- read_csv("data/trend_ca_20210112.csv") %>% 
+  select(-c(CumulativeNegative , CrudeRateNegative, PositiveTests, PositivePercentage, TotalPillar1, TotalPillar2, CrudeRateDeaths, CrudeRatePositive)) %>% 
+  filter(CAName == "East Lothian") %>% 
+  mutate(Date = ymd(as.character(Date)))
+
+
+county_cumulative <- county_data %>% 
+  select(-c(DailyPositive,DailyDeaths, CA, CAName)) %>% 
+  filter(Date == "2021-01-01") %>% 
+  select(-Date) %>% 
+  pivot_longer(cols =c(CumulativePositive, CumulativeDeaths),
+               names_to = "Stats",
+               values_to = "CumulativeTotals") 
+
+ 
