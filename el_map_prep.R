@@ -75,11 +75,33 @@ county_data <- read_csv("data/trend_ca_20210112.csv") %>%
 
 
 county_cumulative <- county_data %>% 
-  select(-c(DailyPositive,DailyDeaths, CA, CAName)) %>% 
+  select(-c(DailyPositive,DailyDeaths, CA, CAName, TotalTests)) %>% 
   filter(Date == "2021-01-01") %>% 
   select(-Date) %>% 
   pivot_longer(cols =c(CumulativePositive, CumulativeDeaths),
                names_to = "Stats",
-               values_to = "CumulativeTotals") 
+              values_to = "CumulativeTotals") %>% 
+  mutate(Stats =factor(Stats, levels = c("CumulativePositive", "CumulativeDeaths"))) 
+
 
  
+  ggplot(county_cumulative) +
+  aes(y=CumulativeTotals, x = Stats, fill = Stats) +
+  geom_col() +
+  scale_fill_manual(values = c("#bfd3e6", "#88419d")) +
+  theme_light() +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.x = element_text(size = 12, vjust=4),
+        axis.text.y = element_blank(),
+        legend.position = "none",
+        line = element_blank(),
+        panel.border = element_blank(),
+        aspect.ratio = 4/5,
+        plot.margin = unit(x = c(0.5, 0, 0, 0), units = "cm"),
+        plot.title = element_text(margin=margin(0,0,20,0))) + 
+  geom_text(aes(label = CumulativeTotals), vjust = -0.5, size = 6) +
+  scale_x_discrete(expand = c(0.1, 0), labels = c("Total Positive Cases", "Total Deaths")) +
+  labs(title = "East Lothian Total Cases and Deaths") +
+  coord_cartesian(clip = "off") 
+
