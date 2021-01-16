@@ -1,3 +1,6 @@
+# TO DO - link csv direct from web and filter  most recent date
+
+
 library(tidyverse)
 library(plotly)
 library(lubridate)
@@ -68,11 +71,12 @@ if( interactive() ) print(map)
 ###### PLOT 2
 #---------------------------------------------------------------------------
 
-county_data <- read_csv("data/trend_ca_20210112.csv") %>% 
-  select(-c(CumulativeNegative , CrudeRateNegative, PositiveTests, PositivePercentage, TotalPillar1, TotalPillar2, CrudeRateDeaths, CrudeRatePositive)) %>% 
-  filter(CAName == "East Lothian") %>% 
+national_data  <- read_csv("data/trend_ca_20210112.csv") %>% 
   mutate(Date = ymd(as.character(Date)))
 
+county_data <- national_data %>% 
+  select(-c(CumulativeNegative , CrudeRateNegative, PositiveTests, PositivePercentage, TotalPillar1, TotalPillar2, CrudeRateDeaths, CrudeRatePositive)) %>% 
+  filter(CAName == "East Lothian") 
 
 county_cumulative <- county_data %>% 
   select(-c(DailyPositive,DailyDeaths, CA, CAName, TotalTests)) %>% 
@@ -105,3 +109,28 @@ county_cumulative <- county_data %>%
   labs(title = "East Lothian Total Cases and Deaths") +
   coord_cartesian(clip = "off") 
 
+  #---------------------------------------------------------------------------
+  ###### KPI 3
+  #---------------------------------------------------------------------------
+  #National KPIs
+  
+  totals_data <- national_data  %>% 
+    select(-c(CumulativeNegative , CrudeRateNegative, PositiveTests, PositivePercentage, TotalPillar1, TotalPillar2, CrudeRateDeaths, CrudeRatePositive))
+  
+  total_tests = sum(totals_data$TotalTests)
+  scot_pos = sum(totals_data$DailyPositive)
+  scot_deaths = sum(totals_data$DailyDeaths)
+  
+  ###########left join population from prev!
+  total_crude <- totals_data %>%
+    filter(CAName == "East Lothian") %>% 
+    arrange(desc(Date)) %>% 
+    slice_max(Date, n = 7) %>% 
+      View()
+
+  #
+  el_crude_today=  POPN(from orig) - total positive 7 day!!
+  scot_crude_today=  POPN(from orig) - total positive
+  total_tests_today = sum(national_data$TotalTests)
+  scot_pos_today = sum(national_data$DailyPositive)
+  scot_deaths_today = sum(national_data$DailyDeaths)
