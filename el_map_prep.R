@@ -9,6 +9,7 @@ library(plotly)
 library(lubridate)
 library(sf)
 library(ggiraph)
+library(readxl)
 
 #Pull in covid data
 locality_data <- read_csv("data/trend_iz.csv", 
@@ -185,8 +186,6 @@ sum(crude_check$Positive7Day)*region_multiplier
 #East Lothian Crude Rate 98 as opposed to 
 #---- TEST FINISH!!!! ____
 
-
-
 national_data <- read_csv("data/daily_cuml_scot_20210116.csv") %>% 
   mutate(Date = ymd(as.character(Date))) %>% 
   mutate(Region = "Scotland") %>% 
@@ -212,7 +211,7 @@ CovidTime <- ggplotly(
           panel.grid.major.y = element_line( size=.1, color="red" )) +
     facet_grid(rows = vars(Region), scales = "free") +
     labs(title = "Cases over Time")) 
-CovidTime %>%  layout(legend = list(orientation = 'v', x = 0.2, y = 1.04), yaxis = y) 
+CovidTime %>%  layout(legend = list(orientation = 'v', x = 0.35, y = 1.15), yaxis = y) 
 
 y <- list(
   title = "Daily Cases")
@@ -221,7 +220,10 @@ y <- list(
 #PIE CHART VAX
 
 # SCOT STATS 
-vaccintion rates 
-hospitalisation rates
+vaccintion rates  -- hospitalisation rates --  7 day cases
 #-----------------------------------------------------------
-7 day cases
+  vax_icu_data <- read_xlsx("data/COVID-19+daily_data_trends.xlsx", sheet = "Table 10 - Vaccinations", skip = 2, col_names = c("Date", "FirstDose", "SecondDose"))
+vax_icu_data$Date = ymd(as.character(vax_icu_data$Date)) 
+head(vax_icu_data)
+str(vax_icu_data)
+scot_population
