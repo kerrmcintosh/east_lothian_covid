@@ -185,39 +185,43 @@ sum(crude_check$Positive7Day)*region_multiplier
 #East Lothian Crude Rate 98 as opposed to 
 #---- TEST FINISH!!!! ____
 
-# SCOT STATS 
-vaccintion rates 
-hospitalisation rates
 
 
 national_data <- read_csv("data/daily_cuml_scot_20210116.csv") %>% 
   mutate(Date = ymd(as.character(Date))) %>% 
   mutate(Region = "Scotland") %>% 
-  select(Date, Region, DailyCases, CumulativeCases, Deaths)
+  select(Date, Region, DailyCases, CumulativeCases, Deaths) 
 
 CovidTime <- totals_data %>% 
   select(-c(TotalTests, CA, DailyDeaths)) %>% 
   rename(DailyCases = DailyPositive, CumulativeCases = CumulativePositive, Region = CAName, Deaths = CumulativeDeaths)
 
-# Add Data daily and cumulative cases, deaths - Scotland and Local Autority Regions
-CovidTime <- rbind(CovidTime, national_data)
-colnames(CovidTime)
-#Create Time Series Line Graph & Scotland daily figures
-CovidLA <- CovidTime  %>% 
-  filter(Region == "East Lothian") 
-CovidScot <- CovidTime  %>% 
-  filter(Region == "Scotland") 
+# Add Data daily and cumulative cases, deaths - Scotland and Local Authority Regions
+CovidTime <- rbind(CovidTime, national_data) %>% 
+  filter(Region == "East Lothian" | Region == "Scotland") 
 
-
-  ggplot() +
-  geom_line(data = CovidLA, aes(x= Date, y = DailyCases, colour = Region)) + 
+CovidTime <- ggplotly(
+  ggplot(CovidTime) +
+  geom_line(aes(x= Date, y = DailyCases, colour = Region)) + 
   theme_classic() +
-  geom_line(data = CovidScot, aes(x= Date, y = DailyCases/100, colour = Region)) +
-    scale_y_continuous(
-      name = "Local Authority Daily Cases",
-      sec.axis = sec_axis(~.*100, name="Scotland Daily CAses")) +
-    scale_colour_manual(values = c("#998ec3", "#e08214")) +
+    scale_colour_manual(values = c("#e08214", "#998ec3")) +
     scale_x_date(date_labels = "%b", date_breaks = "1 month") +
     theme(legend.title = element_blank(),
-          legend.justification=c(0.05,0.95),
-          legend.position=c(0.05,0.95))
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          panel.grid.major.y = element_line( size=.1, color="red" )) +
+    facet_grid(rows = vars(Region), scales = "free") +
+    labs(title = "Cases over Time")) 
+CovidTime %>%  layout(legend = list(orientation = 'v', x = 0.2, y = 1.04), yaxis = y) 
+
+y <- list(
+  title = "Daily Cases")
+
+#-----------------------------------------------------------
+#PIE CHART VAX
+
+# SCOT STATS 
+vaccintion rates 
+hospitalisation rates
+#-----------------------------------------------------------
+7 day cases
