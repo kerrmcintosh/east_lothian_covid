@@ -9,7 +9,6 @@ library(plotly)
 library(lubridate)
 library(sf)
 library(ggiraph)
-library(readxl)
 
 #Pull in covid data
 locality_data <- read_csv("data/trend_iz.csv", 
@@ -220,10 +219,75 @@ y <- list(
 #PIE CHART VAX
 
 # SCOT STATS 
-vaccintion rates  -- hospitalisation rates --  7 day cases
+vaccintion rates  --  7 day cases
 #-----------------------------------------------------------
-  vax_icu_data <- read_xlsx("data/COVID-19+daily_data_trends.xlsx", sheet = "Table 10 - Vaccinations", skip = 2, col_names = c("Date", "FirstDose", "SecondDose"))
-vax_icu_data$Date = ymd(as.character(vax_icu_data$Date)) 
+  vax_icu_data <- read_excel("data/COVID-19+daily_data_trends.xlsx", sheet = "Table 10 - Vaccinations", skip = 2) %>% 
+  rename("FirstDose" = "Number of people who have received the first dose of the Covid vaccination", "SecondDose" = "Number of people who have received the second dose of the Covid vaccination" )
 head(vax_icu_data)
-str(vax_icu_data)
-scot_population
+class(vax_icu_data$Date)
+vax_icu_data <- vax_icu_data %>% 
+  mutate(Date = as.character(vax_icu_data$Date)) %>% 
+  arrange(desc(Date)) %>% 
+  top_n(1) %>% 
+  mutate(propotion_first = round((FirstDose/scot_population)*100, 1),
+         propotion_not_first = 100 - propotion_first) %>% 
+  mutate(propotion_second = round((SecondDose/scot_population)*100, 1),
+         propotion_not_second = 100 - propotion_second)
+
+first_vax_pie <- vax_icu_data %>% 
+  select(propotion_first, propotion_not_first) %>% 
+  pivot_longer(cols =c(propotion_first, propotion_not_first),
+               names_to = "split",
+               values_to = "split_numbers") %>% 
+  mutate(split =factor(split, levels = c("propotion_first", "propotion_not_first"))) 
+
+
+first_vax_pie<- ggplot(first_vax_pie, aes(x="", y=split_numbers, fill=split)) +
+  geom_bar(width = 1, stat = "identity")
+
+first_vax_pie <- first_vax_pie + 
+  coord_polar("y", start=0)+ 
+  scale_fill_brewer(palette = "Purples", labels = c("Had First Dose", "Not Had First Dose")) + 
+  theme_void() +
+  theme(axis.text.x=element_blank(),
+        legend.title = element_blank(),
+        legend.position = c(1.1,.8)) +
+  geom_text(aes(y = split_numbers/2, label = paste0(split_numbers, " %"))) +
+  labs(title = "Proportion of Scottish Population who have\n received First Dose of Vaccination")
+
+first_vax_pie
+
+second_vax_pie <- vax_icu_data %>% 
+  select(propotion_second, propotion_not_second) %>% 
+  pivot_longer(cols =c(propotion_second, propotion_not_second),
+               names_to = "split",
+               values_to = "split_numbers") %>% 
+  mutate(split =factor(split, levels = c("propotion_second", "propotion_not_second"))) 
+
+
+second_vax_pie<- ggplot(second_vax_pie, aes(x="", y=split_numbers, fill=split)) +
+  geom_bar(width = 1, stat = "identity")
+
+#  Initially do this stat as a text KPI!!!!!!!!!!!!!
+second_vax_pie <- second_vax_pie + 
+  coord_polar("y", start=0)+ 
+  scale_fill_brewer(palette = "Purples", labels = c("Had Second Dose", "Not Had Second Dose")) + 
+  theme_void() +
+  theme(axis.text.x=element_blank(),
+        legend.title = element_blank(),
+        legend.position = c(1.1,.8)) +
+  geom_text(aes(y = split_numbers/2, label = paste0(split_numbers, " %"))) +
+  labs(title = "Proportion of Scottish Population who have\n received Second Dose of Vaccination")
+
+second_vax_pie
+
+#---------hospitalisation rates ---------------------------------------
+
+hospitalisation_data <- read_excel("data/COVID-19+daily_data_trends.xlsx", sheet = "Table 2 - Hospital Care", skip = 2) 
+  # rename("FirstDose" = "Number of people who have received the first dose of the Covid vaccination", "SecondDose" = "Number of people who have received the second dose of the Covid vaccination" )
+
+
+hospitalisation_data <- hospitalisation_data %>% 
+  janitor::clean_names() %>% 
+  rename("icu_covid" = "x_i_covid_19_patients_in_icu_or_combined_icu_hdu" , "all_hospital" = "ii_covid_19_patients_in_hospital_including_those_in_icu" ) %>% 
+  arrange(desc(reporting_date))
