@@ -290,4 +290,24 @@ hospitalisation_data <- read_excel("data/COVID-19+daily_data_trends.xlsx", sheet
 hospitalisation_data <- hospitalisation_data %>% 
   janitor::clean_names() %>% 
   rename("icu_covid" = "x_i_covid_19_patients_in_icu_or_combined_icu_hdu" , "all_hospital" = "ii_covid_19_patients_in_hospital_including_those_in_icu" ) %>% 
-  arrange(desc(reporting_date))
+  mutate(date = ymd(as.character(str_sub(reporting_date, 1, 10))))  %>% 
+  arrange(desc(date))
+
+View(hospitalisation_data)
+
+hospitalisation_data <- ggplotly(
+  ggplot(hospitalisation_data) +
+    geom_line(aes(x= reporting_date, y = all_hospital, colour = all_hospital)) + 
+    theme_classic() +
+    scale_colour_manual(values = c("#e08214", "#998ec3")) +
+    scale_x_date(date_labels = "%b", date_breaks = "1 month") +
+    theme(legend.title = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          panel.grid.major.y = element_line( size=.1, color="red" )) +
+    # facet_grid(rows = vars(Region), scales = "free") +
+    labs(title = "Cases over Time")) 
+# hospitalisation_data %>%  layout(legend = list(orientation = 'v', x = 0.35, y = 1.15), yaxis = y) 
+
+# y <- list(
+#   title = "Daily Cases")
