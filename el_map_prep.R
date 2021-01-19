@@ -9,6 +9,7 @@ library(plotly)
 library(lubridate)
 library(sf)
 library(ggiraph)
+library(readxl)
 
 #Pull in covid data
 locality_data <- read_csv("data/trend_iz.csv", 
@@ -291,23 +292,30 @@ hospitalisation_data <- hospitalisation_data %>%
   janitor::clean_names() %>% 
   rename("icu_covid" = "x_i_covid_19_patients_in_icu_or_combined_icu_hdu" , "all_hospital" = "ii_covid_19_patients_in_hospital_including_those_in_icu" ) %>% 
   mutate(date = ymd(as.character(str_sub(reporting_date, 1, 10))))  %>% 
-  arrange(desc(date))
+  arrange(desc(date)) %>% 
+  select(-reporting_date) %>% 
+  pivot_longer(cols =c(all_hospital, icu_covid),
+               names_to = "hospitalisation",
+               values_to = "numbers") %>% 
+  mutate(hospitalisation = ifelse( hospitalisation == "icu_covid", "ICU", "All Hospital"))
 
-View(hospitalisation_data)
+view(hospitalisation_data)
 
 hospitalisation_data <- ggplotly(
   ggplot(hospitalisation_data) +
-    geom_line(aes(x= reporting_date, y = all_hospital, colour = all_hospital)) + 
+    geom_line(aes(x= date, y = numbers, colour = hospitalisation )) + 
     theme_classic() +
-    scale_colour_manual(values = c("#e08214", "#998ec3")) +
-    scale_x_date(date_labels = "%b", date_breaks = "1 month") +
+    scale_colour_manual(values = c("#e08214", "#998ec3"), labels=c("Covid All Hospital Patients", "Covid ICU Patients")) +
+    scale_x_date(date_labels = "%b %y", date_breaks = "1 month") +    
     theme(legend.title = element_blank(),
-          axis.title.x = element_blank(),
-          axis.title.y = element_blank(),
-          panel.grid.major.y = element_line( size=.1, color="red" )) +
-    # facet_grid(rows = vars(Region), scales = "free") +
-    labs(title = "Cases over Time")) 
-# hospitalisation_data %>%  layout(legend = list(orientation = 'v', x = 0.35, y = 1.15), yaxis = y) 
+          panel.grid.major.y = element_line( size=.1, color="red" ),
+          axis.title.x = element_blank()) +
+  labs(title = "Covid Hospitalisation and ICU numbers in Scotland", y = "Covid Hospitalisation Numbers") )
 
 # y <- list(
-#   title = "Daily Cases")
+#   title = "Covid Hospitalisation Numbers")
+# 
+hospitalisation_data %>%  layout(legend = list(orientation = 'v', x = 0.65, y = 0.99))
+
+
+hospitalisation_data
