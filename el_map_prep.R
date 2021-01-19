@@ -208,7 +208,7 @@ CovidTime <- ggplotly(
     theme(legend.title = element_blank(),
           axis.title.x = element_blank(),
           axis.title.y = element_blank(),
-          panel.grid.major.y = element_line( size=.1, color="red" )) +
+          panel.grid.major.y = element_line( size=.1, color="#bfd3e6" )) +
     facet_grid(rows = vars(Region), scales = "free") +
     labs(title = "Cases over Time")) 
 CovidTime %>%  layout(legend = list(orientation = 'v', x = 0.35, y = 1.15), yaxis = y) 
@@ -308,7 +308,7 @@ hospitalisation_data <- ggplotly(
     scale_colour_manual(values = c("#e08214", "#998ec3"), labels=c("Covid All Hospital Patients", "Covid ICU Patients")) +
     scale_x_date(date_labels = "%b %y", date_breaks = "1 month") +    
     theme(legend.title = element_blank(),
-          panel.grid.major.y = element_line( size=.1, color="red" ),
+          panel.grid.major.y = element_line( size=.1, color="#bfd3e6" ),
           axis.title.x = element_blank()) +
   labs(title = "Covid Hospitalisation and ICU numbers in Scotland", y = "Covid Hospitalisation Numbers") )
 
