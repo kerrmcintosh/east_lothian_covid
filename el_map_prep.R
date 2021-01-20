@@ -82,11 +82,10 @@ if( interactive() ) print(map)
 national_data  <- read_csv("data/trend_ca.csv") %>% 
   mutate(Date = ymd(as.character(Date)))
 
-county_data <- national_data %>% 
-  select(-c(CumulativeNegative , CrudeRateNegative, PositiveTests, PositivePercentage, TotalPillar1, TotalPillar2, CrudeRateDeaths, CrudeRatePositive)) %>% 
-  filter(CAName == "East Lothian") 
+colnames(national_data)
 
-county_cumulative <- county_data %>% 
+county_cumulative <- national_data %>%
+  filter(CAName == "East Lothian") %>% 
   select(-c(DailyPositive,DailyDeaths, CA, CAName, TotalTests)) %>% 
   filter(Date == "2021-01-01") %>% 
   select(-Date) %>% 
@@ -133,9 +132,9 @@ population <- locality_data %>%
 
 scot_population <- sum(population$population)
 
-total_tests = sum(totals_data$TotalTests)
-scot_pos = sum(totals_data$DailyPositive)
-scot_deaths = sum(totals_data$DailyDeaths)
+total_tests <- sum(totals_data$TotalTests)
+scot_pos <- sum(totals_data$DailyPositive)
+scot_deaths <- sum(totals_data$DailyDeaths)
 
 region_total_crude <- totals_data %>%
   filter(CAName == "East Lothian") %>% 
@@ -192,7 +191,7 @@ national_data <- read_csv("data/daily_cuml_scot_20210116.csv") %>%
   select(Date, Region, DailyCases, CumulativeCases, Deaths) 
 
 CovidTime <- totals_data %>% 
-  select(-c(TotalTests, CA, DailyDeaths)) %>% 
+  select(-c(CA, DailyDeaths)) %>% 
   rename(DailyCases = DailyPositive, CumulativeCases = CumulativePositive, Region = CAName, Deaths = CumulativeDeaths)
 
 # Add Data daily and cumulative cases, deaths - Scotland and Local Authority Regions
