@@ -2,21 +2,26 @@
 
 server <- function(input, output) {
   
+  output$map_title<- renderText({
+    paste0("East Lothian Locality Infection Rate")
+  })
+  
   output$map <- renderGirafe({
     # react <- ggplot(data[which(data$model==input$plot1_selected),], aes(x=cty)) +
     #   geom_bar()
       gg <- ggplot(el_map) +
         geom_sf_interactive(aes(fill = CrudeRate7DayPositive, 
-                                tooltip = c(paste0(IntZoneName, "\n",real_rate_per_OT,  " infections per 100,000 \n (Actual rate over previous 7 days) \n", Positive7Day, " infections in last 7 days \n(", abs(wow), " ",change,")")),  
+                                tooltip = c(paste0(IntZoneName, "\n",real_rate_per_OT,  " infections per 100,000 \n (Actual rate over previous 7 days) \n", Positive7Day, " infections in last 7 days \n(", abs(wow), " ",change,")", "\nX cumulative cases")),  
                                 data_id = IntZoneName)) +
         scale_fill_brewer(palette = "Purples") +
         theme_void() +
-        labs(title = "East Lothian Locality Infection Rate ", subtitle = "Click map for locality info" ,fill = "Infections per 100,000 \n(Crude Rate)") +
+        labs(subtitle = "(Click map for locality info)" ,fill = "Infections per 100,000 \n(Crude Rate)") +
         guides(shape = guide_legend(override.aes = list(size = 1)),
                color = guide_legend(override.aes = list(size = 1))) +
         theme(legend.title = element_text(size = 7), 
               legend.text = element_text(size = 5),
-              legend.position = c(.9,.85))
+              legend.position = c(.9,.9),
+              plot.margin = margin(0, 0, 0, 0, "cm"))
       map <- girafe(ggobj = gg) 
       # x <- ggiraphOutput(height = .5, width = 1)
       map <- girafe_options(map,
@@ -27,7 +32,11 @@ server <- function(input, output) {
       map
   })
   
-  output$bar <- renderPlot({
+  output$bar_title<- renderText({
+    paste0("Total Cases and Deaths")
+  })
+  
+  output$el_bar <- renderPlot({
   ggplot(county_cumulative) +
     aes(y=CumulativeTotals, x = Stats, fill = Stats) +
     geom_col() +
@@ -40,16 +49,39 @@ server <- function(input, output) {
           legend.position = "none",
           line = element_blank(),
           panel.border = element_blank(),
-          aspect.ratio = 4/5,
-          plot.margin = unit(x = c(0.5, 0, 0, 0), units = "cm"),
-          plot.title = element_text(margin=margin(0,0,20,0))) + 
+          aspect.ratio = 4/5
+          # plot.margin = margin(0, 0, 0, 0, "cm"),
+          # plot.title = element_text(family = "Helvetica", face = "bold", size = (15), color = "#696969", margin=margin(0,0,20,0))
+          ) +
+          # plot.margin = unit(x = c(0.5, 0, 0, 0), units = "cm"),
     geom_text(aes(label = CumulativeTotals), vjust = -0.5, size = 6) +
     scale_x_discrete(expand = c(0.1, 0), labels = c("Total Positive Cases", "Total Deaths")) +
-    labs(title = "East Lothian Total Cases and Deaths") +
+    # labs(title = "Total Cases & Deaths") +
     coord_cartesian(clip = "off") 
   })
   
+  output$la_line_title<- renderText({
+    paste0(input$la_line_plot ," Over Time")
+  })
   
+  output$la_line <- renderPlotly({  
+  CovidTime <- ggplotly(
+    ggplot(CovidTime) +
+      geom_line(aes(x= Date, y = DailyCases, colour = Region)) + 
+      theme_classic() +
+      scale_colour_manual(values = c("#998ec3","#e08214")) +
+      scale_x_date(date_labels = "%b", date_breaks = "1 month") +
+      theme(
+        # legend.title = element_blank(),
+            legend.position = "none",
+            axis.title.x = element_blank(),
+            axis.title.y = element_blank(),
+            panel.grid.major.y = element_line( size=.1, color="#bfd3e6" )) +
+      facet_grid(rows = vars(Region), scales = "free"))
+      # labs(title = "Cases over Time")) 
+  # CovidTime %>%  layout(legend = list(orientation = 'v', x = 0.35, y = 1.15), yaxis = y_la) 
+  
+  })
   
     output$demo_text<- renderText({
       paste0("TEST TEXT")
@@ -58,6 +90,84 @@ server <- function(input, output) {
       paste0("TEST TEXT2")
     })
   
+    output$scot_bar <- renderPlot({
+      ggplot(scot_cumulative) +
+        aes(y=CumulativeTotals, x = Stats, fill = Stats) +
+        geom_col() +
+        scale_fill_manual(values = c("#bfd3e6", "#88419d")) +
+        theme_light() +
+        theme(axis.title.x = element_blank(),
+              axis.title.y = element_blank(),
+              axis.text.x = element_text(size = 12, vjust=4),
+              axis.text.y = element_blank(),
+              legend.position = "none",
+              line = element_blank(),
+              panel.border = element_blank(),
+              aspect.ratio = 4/5
+
+        ) +
+        geom_text(aes(label = CumulativeTotals), vjust = -0.5, size = 6) +
+        scale_x_discrete(expand = c(0.1, 0), labels = c("Total Positive Cases", "Total Deaths")) +
+        coord_cartesian(clip = "off") 
+    })
+    
+    output$el_cases<- renderText({
+      paste0("Positive Cases Today (DATE): ", el_total$DailyCases)
+    })
+    
+    output$el_deaths<- renderText({
+      paste0("Deaths Today (DATE): ", el_total$Deaths)
+    })
+    
+    output$el_tests<- renderText({
+      paste0("Tests Today (DATE): ", el_total$TotalTests)
+    })
+    
+    output$el_crude<- renderText({
+      paste0("East Lothian Crude Infections per 100,000: ", round(el_crude_today))
+    })
   
+    output$scot_cases<- renderText({
+      paste0("Positive Cases Toay (DATE): ", scot_total$DailyCases)
+    })
+    
+    output$scot_deaths<- renderText({
+      paste0("Deaths Today (DATE): ", scot_total$Deaths)
+    })
+    
+    output$scot_tests<- renderText({
+      paste0("Tests Today (DATE): ", scot_total$TotalTests)
+    })
+    
+    output$scot_crude<- renderText({
+      paste0("Crude Infections per 100,000: ", round(scot_crude_today ))
+    })
+    
+    output$hospitalisation <- renderPlotly({  
+      hospitalisation_data <- ggplotly(
+        ggplot(hospitalisation_data) +
+          geom_line(aes(x= date, y = numbers, colour = hospitalisation )) + 
+          theme_classic() +
+          scale_colour_manual(values = c("#e08214", "#998ec3"), labels=c("Covid All Hospital Patients", "Covid ICU Patients")) +
+          scale_x_date(date_labels = "%b %y", date_breaks = "1 month") +    
+          theme(legend.title = element_blank(),
+                panel.grid.major.y = element_line( size=.1, color="#bfd3e6" ),
+                axis.title.x = element_blank(),
+                axis.title.y = element_blank()) )
+      
+      hospitalisation_data %>%  layout(legend = list(orientation = 'v', x = 0.65, y = 0.99))
+      
+    })
+    output$vax_one <- renderPlot({
+    first_vax_pie <- first_vax_pie + 
+      coord_polar("y", start=0)+ 
+      scale_fill_brewer(palette = "Purples", labels = c("Had First Dose", "Not Had First Dose")) + 
+      theme_void() +
+      theme(axis.text.x=element_blank(),
+            legend.title = element_blank(),
+            legend.position = "top") +
+      geom_text(aes(y = split_numbers/2, label = paste0(split_numbers, " %"))) 
+    first_vax_pie
+    })
   }
   

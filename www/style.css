@@ -1,0 +1,73 @@
+body {
+  margin-left: 10px;
+  color: #696969;
+}
+
+.separator {
+  height: 20px;
+    border-left: 1px solid #DCDCDC;
+}
+
+.line {
+  width: 80%;
+  border-top: 1px solid #DCDCDC;
+  margin: 0 auto 20px auto;
+}
+
+
+.navbar-nav { 
+  color: #808080;
+}
+
+.left_line{
+  border-left: 1px solid #DCDCDC;
+}
+
+.radio_button {
+  border: 1px solid #DCDCDC ;
+  background-color: #F0F0F0;
+  padding: 0 5px 0 8px;
+}
+
+.radio_buttontop {
+  margin-top: 75px;
+}
+
+
+
+
+li a {
+  color: #696969;
+}
+
+
+
+.footer_text {
+display: block;
+text-align: center;
+font-style: italic;
+}
+
+
+h4, h5 {
+font-weight:bold;
+  color: #696969;
+}
+
+h6 {
+font-size :1.6REM;
+  color: #696969;
+
+}
+.margin_reduce {
+  margin-top: 0px;
+}
+
+
+
+.about {
+  border: 1px solid #BEBEBE ;
+  background-color: #e6f5ff;
+  padding: 3px 5px;
+  margin: 5px 0;
+}
