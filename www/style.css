@@ -13,7 +13,33 @@ body {
   border-top: 1px solid #DCDCDC;
   margin: 0 auto 20px auto;
 }
+.shade {
+  background-color: #f0f0f0;
+}
 
+.box_head {
+  background-color: #8c96c6;
+  height: 30px;  
+  line-height: 30px;
+  padding-left: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.white {
+  color: #ffffff;
+}
+.box {
+  border: 1px solid #8c96c6;
+    padding-left: 10px;
+
+}
+
+.main-header .logo {
+  font-family: "Georgia", Times, "Times New Roman", serif;
+  font-weight: bold;
+  font-size: 24px;
+}
 
 .navbar-nav { 
   color: #808080;

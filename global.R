@@ -10,6 +10,8 @@ library(lubridate)
 library(sf)
 library(ggiraph)
 library(readxl)
+library(shinydashboard)
+library(shiny)
 
 #Pull in covid data
 locality_data <- read_csv("data/trend_iz.csv", 

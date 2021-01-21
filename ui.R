@@ -21,11 +21,16 @@ ui <- fluidPage(
                                     ),
                           div(plotOutput("el_bar", height = 320))
                           ),
-                          fluidRow(textOutput("el_cases")),
-                          fluidRow(textOutput("el_tests")),
-                          fluidRow(textOutput("el_deaths")),
-                          fluidRow(textOutput("el_crude")),
-                          fluidRow(paste("CRUDE RATES: EL & SCOT"))),
+                            div(class ="box_head", h6(class ="white", "East Lothian Stats")),
+                          div(class="box",
+                            textOutput("el_cases"), 
+                            textOutput("el_tests"), 
+                            textOutput("el_deaths"), 
+                            textOutput("el_crude"), 
+                            paste("CRUDE RATES: EL & SCOT")
+                                     
+                          )
+                          ),
                           column(8,
                                  tags$h6(textOutput("map_title")),
                                  girafeOutput("map", height = 500))
@@ -42,10 +47,10 @@ ui <- fluidPage(
                  )),
                  column(10, 
                         plotlyOutput("la_line"))),
-                 fluidRow(
+                 fluidRow(div(class ="shade",
                    tags$h3("National Picture"),
                    column(3,
-                          h6("Scottish Cumulative Cases and Deaths"),
+                          h6(div(class ="shade", "Scottish Cumulative Cases and Deaths")),
                           div(plotOutput("scot_bar", height = 275)),
                           fluidRow(textOutput("scot_cases")),
                           fluidRow(textOutput("scot_tests")),
@@ -58,7 +63,7 @@ ui <- fluidPage(
                           h6("Proportion of Scottish Population who have received First Dose of Vaccination"),
                           plotOutput("vax_one", height = 275),
                           fluidRow(paste("number vaxed")),
-                          fluidRow(paste("number vaxed 2 and %")))
+                          fluidRow(paste("number vaxed 2 and %"))))
                  )
                  
           
