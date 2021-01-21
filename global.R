@@ -18,6 +18,19 @@ locality_data <- read_csv("data/trend_iz.csv",
                           col_types = cols(CrudeRate7DayPositive = col_character(), Positive7Day = col_integer())) %>% 
   mutate(Date = ymd(as.character(Date))) 
 
+date_working <- locality_data %>% 
+  select(Date) %>% 
+  arrange(desc(Date)) %>% 
+  head(1) 
+app_date <- locality_data %>% 
+  select(Date) %>% 
+  arrange(desc(Date)) %>% 
+  head(1) 
+
+head_date <- date_working$Date %>% 
+  format('%d/%m/%y')
+app_date
+
 el_data <- locality_data %>% 
   select(-c(Positive7DayQF, CrudeRate7DayPositiveQF)) %>% 
   filter(CAName == "East Lothian") %>% 
@@ -26,7 +39,10 @@ el_data <- locality_data %>%
   mutate(multiplier = 100000/Population) %>% 
   mutate(Positive7Day = ifelse(is.na(Positive7Day), 0, Positive7Day)) %>% 
   mutate(real_rate_per_OT = round(multiplier*Positive7Day))
-
+el_data %>% 
+  filter(CAName == "East Lothian") %>% 
+  filter(Date > (app_date-7)) %>% 
+  view()
 #Convert crude rate to ordered factor
 el_data$CrudeRate7DayPositive<- factor(el_data$CrudeRate7DayPositive, levels = c(0, "1 to 49", "50 to 99", "100 to 199", "200 to 399", "400+"))
 unique(el_data$CrudeRate7DayPositive)
@@ -48,6 +64,7 @@ el_map <- left_join(el_map, el_data) %>%
   )   %>% 
   filter(Date == "2021-01-01") 
 
+el_7day <- sum(el_map$Positive7Day)
 
 tooltip_css <- "background-color:#9c9a98; 
                 color: #000000;"
@@ -62,7 +79,7 @@ national_data  <- read_csv("data/trend_ca.csv") %>%
 county_cumulative <- national_data %>%
   filter(CAName == "East Lothian") %>% 
   select(-c(DailyPositive,DailyDeaths, CA, CAName, TotalTests)) %>% 
-  filter(Date == "2021-01-01") %>% 
+  filter(Date == app_date) %>% 
   select(-Date) %>% 
   pivot_longer(cols =c(CumulativePositive, CumulativeDeaths),
                names_to = "Stats",
@@ -77,7 +94,7 @@ totals_data <- national_data  %>%
 
 colnames(locality_data)
 population <- locality_data %>% 
-  filter(Date == "2021-01-01") %>% 
+  filter(Date == app_date) %>% 
   group_by(CAName) %>% 
   summarise(population = sum(Population))
 
@@ -119,7 +136,7 @@ scot_deaths_today = sum(national_data$DailyDeaths)
 crude_check <- locality_data %>% 
   select(-c(Positive7DayQF, CrudeRate7DayPositiveQF)) %>% 
   filter(CAName == "East Lothian") %>%
-  filter(Date =="2021-01-12") %>% 
+  filter(Date ==app_date) %>% 
   rename(InterZone = IntZone) %>% 
   mutate(CrudeRate7DayPositive = ifelse(is.na(CrudeRate7DayPositive), 0, CrudeRate7DayPositive)) %>% 
   mutate(multiplier = 100000/Population) %>% 
@@ -147,12 +164,12 @@ CovidTime <- rbind(CovidTime, national_cuml_data) %>%
 y_la <- list(
   title = "Daily Cases")
 
-el_total <- CovidTime %>% 
-  filter(Date == "2021-01-01") %>% 
-  filter(Region == "East Lothian")
+el_daily <- totals_data %>% 
+  filter(Date == app_date) %>%
+  filter(CAName == "East Lothian")
 
 scot_total <- CovidTime %>% 
-  filter(Date == "2021-01-01") %>% 
+  filter(Date == app_date) %>% 
   filter(Region == "Scotland")
 
 #-------------SCOT STATS _______________
@@ -161,7 +178,7 @@ totals_data <- national_data  %>%
 
 colnames(locality_data)
 population <- locality_data %>% 
-  filter(Date == "2021-01-01") %>% 
+  filter(Date == app_date) %>% 
   group_by(CAName) %>% 
   summarise(population = sum(Population))
 

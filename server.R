@@ -3,7 +3,7 @@
 server <- function(input, output) {
   
   output$map_title<- renderText({
-    paste0("East Lothian Locality Infection Rate")
+    paste0("East Lothian Locality Covid Picture")
   })
   
   output$map <- renderGirafe({
@@ -11,17 +11,19 @@ server <- function(input, output) {
     #   geom_bar()
       gg <- ggplot(el_map) +
         geom_sf_interactive(aes(fill = CrudeRate7DayPositive, 
-                                tooltip = c(paste0(IntZoneName, "\n",real_rate_per_OT,  " infections per 100,000 \n (Actual rate over previous 7 days) \n", Positive7Day, " infections in last 7 days \n(", abs(wow), " ",change,")", "\nX cumulative cases")),  
+                                tooltip = c(paste0(IntZoneName, "\n",real_rate_per_OT,  " infections per 100,000 (Actual rate over previous 7 days) \n", Positive7Day, " infections in last 7 days \n(", abs(wow), " ",change,")")),  
                                 data_id = IntZoneName)) +
         scale_fill_brewer(palette = "Purples") +
         theme_void() +
-        labs(subtitle = "(Click map for locality info)" ,fill = "Infections per 100,000 \n(Crude Rate)") +
+        geom_text(x=10, y=30, label="Scatter plot") +
+        labs(subtitle = "Click map for locality info" ,fill = "Infections per 100,000 \n(Crude Rate)") +
         guides(shape = guide_legend(override.aes = list(size = 1)),
                color = guide_legend(override.aes = list(size = 1))) +
         theme(legend.title = element_text(size = 7), 
               legend.text = element_text(size = 5),
               legend.position = c(.9,.9),
-              plot.margin = margin(0, 0, 0, 0, "cm"))
+              plot.margin = margin(0, 0, 0, 0, "cm"),
+              plot.subtitle = element_text(size = 10, face = "italic", colour = "#696969"))
       map <- girafe(ggobj = gg) 
       # x <- ggiraphOutput(height = .5, width = 1)
       map <- girafe_options(map,
@@ -40,7 +42,7 @@ server <- function(input, output) {
   ggplot(county_cumulative) +
     aes(y=CumulativeTotals, x = Stats, fill = Stats) +
     geom_col() +
-    scale_fill_manual(values = c("#bfd3e6", "#88419d")) +
+    scale_fill_manual(values = c("#bcbddc", "#88419d")) +
     theme_light() +
     theme(axis.title.x = element_blank(),
           axis.title.y = element_blank(),
@@ -63,11 +65,15 @@ server <- function(input, output) {
   output$la_line_title<- renderText({
     paste0(input$la_line_plot ," Over Time")
   })
-  
+
+  colnames(CovidTime)
   output$la_line <- renderPlotly({  
   CovidTime <- ggplotly(
     ggplot(CovidTime) +
-      geom_line(aes(x= Date, y = DailyCases, colour = Region)) + 
+      geom_line(aes(x= Date, y = case_when(
+        input$la_line_plot == "Cases" ~ DailyCases,
+        input$la_line_plot == "Deaths" ~ Deaths,
+        TRUE ~ TotalTests), colour = Region)) + 
       theme_classic() +
       scale_colour_manual(values = c("#998ec3","#e08214")) +
       scale_x_date(date_labels = "%b", date_breaks = "1 month") +
@@ -94,7 +100,7 @@ server <- function(input, output) {
       ggplot(scot_cumulative) +
         aes(y=CumulativeTotals, x = Stats, fill = Stats) +
         geom_col() +
-        scale_fill_manual(values = c("#bfd3e6", "#88419d")) +
+        scale_fill_manual(values = c("#bcbddc", "#88419d")) +
         theme_light() +
         theme(axis.title.x = element_blank(),
               axis.title.y = element_blank(),
@@ -112,35 +118,39 @@ server <- function(input, output) {
     })
     
     output$el_cases<- renderText({
-      paste0("Positive Cases Today (DATE): ", el_total$DailyCases)
+      paste0(("<b>New Cases: </b>"), el_daily$DailyPositive)
     })
     
     output$el_deaths<- renderText({
-      paste0("Deaths Today (DATE): ", el_total$Deaths)
+      paste0("<b>Deaths: </b>", el_daily$DailyDeaths)
     })
     
     output$el_tests<- renderText({
-      paste0("Tests Today (DATE): ", el_total$TotalTests)
+      paste0("<b>Tests: </b>", el_daily$TotalTests)
+    })
+    
+    output$el_sevenday<- renderText({
+      paste0("<b>Cases in last 7 days: </b>", el_7day)
     })
     
     output$el_crude<- renderText({
-      paste0("East Lothian Crude Infections per 100,000: ", round(el_crude_today))
+      paste0("<b>Crude Infection Rate: </b>", round(el_crude_today), " per 100,000 over previous 7 days")
     })
   
     output$scot_cases<- renderText({
-      paste0("Positive Cases Toay (DATE): ", scot_total$DailyCases)
+      paste0("<b>New Cases: </b>", scot_total$DailyCases)
     })
     
     output$scot_deaths<- renderText({
-      paste0("Deaths Today (DATE): ", scot_total$Deaths)
+      paste0("<b>Deaths: </b>", scot_total$Deaths)
     })
     
     output$scot_tests<- renderText({
-      paste0("Tests Today (DATE): ", scot_total$TotalTests)
+      paste0("<b>Tests: </b>", scot_total$TotalTests)
     })
     
     output$scot_crude<- renderText({
-      paste0("Crude Infections per 100,000: ", round(scot_crude_today ))
+      paste0("<b>Crude Infections per 100,000: </b>", round(scot_crude_today ))
     })
     
     output$hospitalisation <- renderPlotly({  

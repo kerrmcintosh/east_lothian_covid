@@ -9,35 +9,34 @@ ui <- fluidPage(
   
   tags$div( 
   #or titlePanel("Hello Shiny!")
-      headerPanel("East Lothian Covid Tracker - DATE")),
+      tags$h3("East Lothian Covid Tracker - ", head_date)),
      
       tabsetPanel(
         #tab 1
         tabPanel("Dashboard", div(class = "separator"),
                  fluidRow(
-                   column(4, class = "col3_pad",style='padding-left:40px;', 
-                          fluidRow(
-                            tags$h6(textOutput("bar_title")
-                                    ),
-                          div(plotOutput("el_bar", height = 320))
-                          ),
-                            div(class ="box_head", h6(class ="white", "East Lothian Stats")),
-                          div(class="box",
-                            textOutput("el_cases"), 
-                            textOutput("el_tests"), 
-                            textOutput("el_deaths"), 
-                            textOutput("el_crude"), 
-                            paste("CRUDE RATES: EL & SCOT")
-                                     
+                   column(8,
+                          tags$h6(class ="padLeft", textOutput("map_title")),
+                          girafeOutput("map")),
+                   column(4, style='padding-right:40px;', 
+                          fluidRow(                            div(class ="box_head", h6(class ="white", "East Lothian Daily Stats")),
+                                                               div(class="box",
+                                                                   htmlOutput("el_cases"), 
+                                                                   htmlOutput("el_deaths"), 
+                                                                   htmlOutput("el_tests"), 
+                                                                   htmlOutput("el_crude"), 
+                                                                   htmlOutput("el_sevenday")
+                                                               ),
+                            tags$h6(textOutput("bar_title")),
+                          div(plotOutput("el_bar", height = 350))
                           )
-                          ),
-                          column(8,
-                                 tags$h6(textOutput("map_title")),
-                                 girafeOutput("map", height = 500))
+
+                          )
+
                           ),
                  fluidRow(
                    div(class = "line"), 
-                   tags$h6(textOutput("la_line_title")),
+                   tags$h6(class ="padLeft2", textOutput("la_line_title")),
                           column(2,class ="radio_buttontop",
                                         tags$div(class ="radio_button",
                                                  radioButtons("la_line_plot",
@@ -48,16 +47,17 @@ ui <- fluidPage(
                  column(10, 
                         plotlyOutput("la_line"))),
                  fluidRow(div(class ="shade",
-                   tags$h3("National Picture"),
+                   tags$div(class="vcenter", h3("National Picture in Scotland"), " Stats not available for East Lothian")),
+                   fluidRow(
                    column(3,
-                          h6(div(class ="shade", "Scottish Cumulative Cases and Deaths")),
+                          h6("Scottish Cumulative Cases and Deaths"),
                           div(plotOutput("scot_bar", height = 275)),
-                          fluidRow(textOutput("scot_cases")),
-                          fluidRow(textOutput("scot_tests")),
-                          fluidRow(textOutput("scot_deaths")),
-                          fluidRow(textOutput("scot_crude")),),
+                          htmlOutput("scot_cases"),
+                          htmlOutput("scot_tests"),
+                          htmlOutput("scot_deaths"),
+                          htmlOutput("scot_crude")),
                    column(6,
-                          h6("Covid Hospitalisation and ICU Numbers"),
+                          h6(class ="padLeft", "Covid Hospitalisation and ICU Numbers"),
                           plotlyOutput("hospitalisation")),
                    column(3,
                           h6("Proportion of Scottish Population who have received First Dose of Vaccination"),
