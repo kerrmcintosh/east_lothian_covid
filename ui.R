@@ -83,12 +83,12 @@ ui <- fluidPage(
                    div(class = "about_us",
                    tags$h6("About This App"),
                    tags$p("This app has been designed using R Shiny to give insight and visualisation into East Lothain data related to Covid-19."),
-                   tags$p("The app is updated daily and is updated as per Public Health Scotland Data Releases.
-                                 Data at Local Authority level is released after 2 days."),
+                   tags$p("The app is updated daily and is updated as per Public Health Scotland Data Releases 
+                                 (data at Local Authority level is released after 2 days)"),
                    tags$p("All covid data is taken from Public Health Scotland: Daily Trends, xxxxxxxx"),
                    tags$p("Population data is taken from"),
                    tags$p("Localities are taken from XXXX and are calculated and about this"),
-                   tags$p("Vaccination and Hospital Data not available at local authority level.  Data is included at national level for info purposes."))),
+                   tags$p("Hospital Data is only available from September 2020.  Vaccination and Hospital Data not available at local authority level.  Data is included at national level for info purposes."))),
                    column(4,
                           tags$div(img(class = "symbol", src="east_lothian.jpg")))
         ),
