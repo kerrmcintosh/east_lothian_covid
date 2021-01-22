@@ -56,7 +56,7 @@ server <- function(input, output) {
           # plot.title = element_text(family = "Helvetica", face = "bold", size = (15), color = "#696969", margin=margin(0,0,20,0))
           ) +
           # plot.margin = unit(x = c(0.5, 0, 0, 0), units = "cm"),
-    geom_text(aes(label = CumulativeTotals), vjust = -0.5, size = 6) +
+    geom_text(aes(label = prettyNum(CumulativeTotals, big.mark=",",scientific=FALSE)), vjust = -0.5, size = 6) +
     scale_x_discrete(expand = c(0.1, 0), labels = c("Total Positive Cases", "Total Deaths")) +
     # labs(title = "Total Cases & Deaths") +
     coord_cartesian(clip = "off") 
@@ -66,14 +66,12 @@ server <- function(input, output) {
     paste0(input$la_line_plot ," Over Time")
   })
 
-  colnames(CovidTime)
   output$la_line <- renderPlotly({  
   CovidTime <- ggplotly(
-    ggplot(CovidTime) +
-      geom_line(aes(x= Date, y = case_when(
-        input$la_line_plot == "Cases" ~ DailyCases,
-        input$la_line_plot == "Deaths" ~ Deaths,
-        TRUE ~ TotalTests), colour = Region)) + 
+    CovidTimeLine %>% 
+      filter(Stats == input$la_line_plot) %>% 
+      ggplot() +
+      geom_line(aes(x= Date, y = Numbers, colour = Region)) + 
       theme_classic() +
       scale_colour_manual(values = c("#998ec3","#e08214")) +
       scale_x_date(date_labels = "%b", date_breaks = "1 month") +
@@ -112,7 +110,7 @@ server <- function(input, output) {
               aspect.ratio = 4/5
 
         ) +
-        geom_text(aes(label = CumulativeTotals), vjust = -0.5, size = 6) +
+        geom_text(aes(label = prettyNum(CumulativeTotals, big.mark=",",scientific=FALSE)), vjust = -0.5, size = 6) +
         scale_x_discrete(expand = c(0.1, 0), labels = c("Total Positive Cases", "Total Deaths")) +
         coord_cartesian(clip = "off") 
     })
@@ -138,11 +136,11 @@ server <- function(input, output) {
     })
   
     output$scot_cases<- renderText({
-      paste0("<b>New Cases: </b>", scot_total$DailyCases)
+      paste0("<b>New Cases: </b>",prettyNum(scot_total$DailyCases, big.mark=",",scientific=FALSE))
     })
     
     output$scot_deaths<- renderText({
-      paste0("<b>Deaths: </b>", scot_total$Deaths)
+      paste0("<b>Deaths: </b>", scot_total$DailyDeaths)
     })
     
     output$scot_tests<- renderText({
@@ -150,7 +148,7 @@ server <- function(input, output) {
     })
     
     output$scot_crude<- renderText({
-      paste0("<b>Crude Infections per 100,000: </b>", round(scot_crude_today ))
+      paste0("<b>Crude Infections Rate: </b>", round(scot_crude_today ), " per 100,000 over previous 7 days")
     })
     
     output$hospitalisation <- renderPlotly({  
@@ -179,5 +177,15 @@ server <- function(input, output) {
       geom_text(aes(y = split_numbers/2, label = paste0(split_numbers, " %"))) 
     first_vax_pie
     })
+   
+    output$had_vax_one<- renderText({
+      paste0(prettyNum(vax_icu_data$FirstDose, big.mark=",",scientific=FALSE), " have had first dose")
+    }) 
+
+    output$had_vax_two<- renderText({
+      paste0(prettyNum(vax_icu_data$SecondDose, big.mark=",",scientific=FALSE), " have had second dose (", vax_icu_data$propotion_second,"%)")
+    }) 
+    
+    
   }
   
