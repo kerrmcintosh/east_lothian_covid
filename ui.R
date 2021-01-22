@@ -9,7 +9,7 @@ ui <- fluidPage(
   
   tags$div( 
   #or titlePanel("Hello Shiny!")
-      tags$h3("East Lothian Covid Tracker - ", head_date)),
+      tags$h3("East Lothian Covid-19 Tracker (", head_date_title, ")")),
      
       tabsetPanel(
         #tab 1
@@ -79,14 +79,22 @@ ui <- fluidPage(
         #tab 2     
         tabPanel("About", div(class = "separator"),
                  fluidRow(
-                   tags$h6(textOutput("demo_text2")),
-                   tags$p("This app is updated daily and is up to date as per Public Health Scotland Data Releases.
-                                Data at Local Authority level is released after 2 days."),
-                   tags$p("All data is taken from Public Health Scotland: Daily Trends, xxxxxxxx"),
-                   tags$p("Vaccination and Hospital Data not available at local autgority data.")),
-        )),
+                   column(8,
+                   div(class = "about_us",
+                   tags$h6("About This App"),
+                   tags$p("This app has been designed using R Shiny to give insight and visualisation into East Lothain data related to Covid-19."),
+                   tags$p("The app is updated daily and is updated as per Public Health Scotland Data Releases.
+                                 Data at Local Authority level is released after 2 days."),
+                   tags$p("All covid data is taken from Public Health Scotland: Daily Trends, xxxxxxxx"),
+                   tags$p("Population data is taken from"),
+                   tags$p("Localities are taken from XXXX and are calculated and about this"),
+                   tags$p("Vaccination and Hospital Data not available at local authority level.  Data is included at national level for info purposes."))),
+                   column(4,
+                          tags$div(img(class = "symbol", src="east_lothian.jpg")))
+        ),
+        div(class="large_div"))),
         div(class = "separator"),
-        tags$footer(class = "footer_text", paste0("Produced by Kerr McIntosh"),
+        tags$footer(class = "footer_text", paste0("Produced by Kerr McIntosh \n"), uiOutput("github"),
                     tags$div(class = "separator"))
             
         )

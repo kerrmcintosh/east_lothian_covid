@@ -1,7 +1,7 @@
 # TO DO - link csv direct from web and filter  most recent date
 # why crude rates for region from IZ and CA dataset different... Check!
 # detail where population taken from
-# Make region choice>?  default East Lothian
+
 
 
 library(tidyverse)
@@ -10,7 +10,6 @@ library(lubridate)
 library(sf)
 library(ggiraph)
 library(readxl)
-library(shinydashboard)
 library(shiny)
 
 #Pull in covid data
@@ -29,19 +28,23 @@ app_date <- locality_data %>%
 
 head_date <- date_working$Date %>% 
   format('%d/%m/%y')
-app_date
+
+head_date_title <- date_working$Date %>% 
+  format('%d %B %Y')
+la_regions <- unique(locality_data$CAName)
+
 
 el_data <- locality_data %>% 
   select(-c(Positive7DayQF, CrudeRate7DayPositiveQF)) %>% 
-  filter(CAName == "East Lothian") %>% 
+  filter(CAName == "East Lothian") %>%
   rename(InterZone = IntZone) %>% 
   mutate(CrudeRate7DayPositive = ifelse(is.na(CrudeRate7DayPositive), 0, CrudeRate7DayPositive)) %>% 
   mutate(multiplier = 100000/Population) %>% 
   mutate(Positive7Day = ifelse(is.na(Positive7Day), 0, Positive7Day)) %>% 
   mutate(real_rate_per_OT = round(multiplier*Positive7Day))
-el_data %>% 
-  filter(CAName == "East Lothian") %>% 
-  filter(Date > (app_date-7)) 
+# el_data %>% 
+#   filter(CAName == "East Lothian") %>% 
+#   filter(Date > (app_date-7)) 
 #Convert crude rate to ordered factor
 el_data$CrudeRate7DayPositive<- factor(el_data$CrudeRate7DayPositive, levels = c(0, "1 to 49", "50 to 99", "100 to 199", "200 to 399", "400+"))
 unique(el_data$CrudeRate7DayPositive)
@@ -52,7 +55,7 @@ el_data %>% write_csv("data_check.csv")
 el_map <- st_read("data/shape_files/SG_IntermediateZoneBdry_2011/") 
 el_map <- left_join(el_map, el_data) %>% 
   select(-c(Name, TotPop2011, ResPop2011, HHCnt2011, StdAreaHa, StdAreaKm2)) %>% 
-  filter(CAName == "East Lothian") %>% 
+  filter(CAName == "East Lothian") %>%
   arrange(IntZoneName, Date) %>% 
   #dplyr lag function to confirm data from 7 days previous - needed to arrange data so picking up correct area
   mutate(wow = Positive7Day - lag(Positive7Day,7)) %>% 
@@ -173,7 +176,7 @@ CovidTimeLine <-  CovidTime %>%
   rename(Cases = DailyCases, Tests = TotalTests) %>% 
   pivot_longer(cols =c(Cases, Deaths, Tests),
                names_to = "Stats",
-               values_to = "Numbers")
+               values_to = "Numbers") 
 
 y_la <- list(
   title = "Daily Cases")

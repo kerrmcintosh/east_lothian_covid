@@ -186,6 +186,9 @@ server <- function(input, output) {
       paste0(prettyNum(vax_icu_data$SecondDose, big.mark=",",scientific=FALSE), " have had second dose (", vax_icu_data$propotion_second,"%)")
     }) 
     
-    
+    output$github <- renderUI({
+      url <- a("github.com/kerrmcintosh", href="https://www.github.com/kerrmcintosh")
+      tagList(url)
+    })
   }
   
