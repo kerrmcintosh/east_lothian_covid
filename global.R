@@ -90,8 +90,10 @@ el_map <- left_join(el_map, el_data) %>%
 
 el_7day <- sum(el_map$Positive7Day)
 
-tooltip_css <- "background-color:#9c9a98; 
-                color: #000000;"
+tooltip_css <- "background-color:#d9d9d9; 
+                color: #000000;
+                font-weight: 500;
+                padding-left: 5px;"
 
 #---------------PLOT 2 ---------------------
 

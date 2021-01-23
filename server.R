@@ -74,7 +74,7 @@ server <- function(input, output) {
       geom_line(aes(x= Date, y = Numbers, colour = Region)) + 
       theme_classic() +
       scale_colour_manual(values = c("#998ec3","#e08214")) +
-      scale_x_date(date_labels = "%b", date_breaks = "1 month") +
+      scale_x_date(date_labels = "%b %y", date_breaks = "1 month") +
       theme(
         # legend.title = element_blank(),
             legend.position = "none",
@@ -163,7 +163,7 @@ server <- function(input, output) {
                 axis.title.x = element_blank(),
                 axis.title.y = element_blank()) )
       
-      hospitalisation_data %>%  layout(legend = list(orientation = 'v', x = 0.65, y = 0.99))
+      hospitalisation_data %>%  layout(legend = list(orientation = 'v', x = 0.1, y = 0.95))
       
     })
     output$vax_one <- renderPlot({
@@ -190,5 +190,27 @@ server <- function(input, output) {
       url <- a("github.com/kerrmcintosh", href="https://www.github.com/kerrmcintosh")
       tagList(url)
     })
+    
+    output$linkedin <- renderUI({
+      url <- a("linkedin.com/kerr-mcintosh", href="https://www.linkedin.com/in/kerr-mcintosh/")
+      tagList(url)
+    })
+    
+    output$daily_url <- renderUI({
+      url <- a("Public Health Scotland Open Data", href="https://www.opendata.nhs.scot/dataset/covid-19-in-scotland")
+      tagList(url)
+    })
+    
+    output$trends_url <- renderUI({
+      url <- a("Scottish Government Statistics", href="https://www.gov.scot/publications/coronavirus-covid-19-trends-in-daily-data/")
+      tagList(url)
+    })
+   
+    output$spatial_url <- renderUI({
+      url <- a("Scottish Government SpatialData.gov.scot", href="https://data.gov.uk/dataset/133d4983-c57d-4ded-bc59-390c962ea280/intermediate-zone-boundaries-2011 ")
+      tagList(url)
+    })
+    
+    
   }
   

@@ -36,7 +36,7 @@ ui <- fluidPage(
 
                           ),
                  fluidRow(
-                   div(class = "line"), 
+                   # div(class = "line"), 
                    div(class ="box_head_90", tags$h6(class ="white_center", textOutput("la_line_title"))),
                           column(2,class ="radio_buttontop",
                                         tags$div(class ="radio_button",
@@ -62,7 +62,7 @@ ui <- fluidPage(
                                                                ),
                           div(class ="box_head", h6(class ="white", "Total Scottish Cases & Deaths")),
                           div(class="box",
-                          div(plotOutput("scot_bar", height = 255)))),
+                          div(plotOutput("scot_bar", height = 275)))),
                    column(6, 
                           div(class ="box_head", h6(class ="white_center", "Covid Hospitalisation and ICU Numbers")),
                           # h6(class ="padLeft", "Covid Hospitalisation and ICU Numbers"),
@@ -74,33 +74,36 @@ ui <- fluidPage(
                           div(class ="box_head", h6(class ="white", "Vaccination Stats")),
                           div(class="box",
                               htmlOutput("had_vax_one"), 
-                              htmlOutput("had_vax_two"), 
+                              htmlOutput("had_vax_two") 
                           )))
                  )
                  
           
         ),
-        #tab 2     
+#tab 2
         tabPanel("About", div(class = "separator"),
                  fluidRow(
                    column(8,
                    div(class = "about_us",
                    tags$h6("About This App"),
-                   tags$p("This app has been designed using R Shiny to give insight and visualisation into East Lothain data related to Covid-19."),
-                   tags$p("The app is updated daily as per Public Health Scotland Data Releases 
-                                 (data at Local Authority level is released after 2 days).  Data Totals are cumulative numbers since 28th February 2020 as per Public Health Scotland Data. 
-                          Hospital Data is only available from September 2020.  Vaccination and Hospital Data not available at local authority level.  Data is included at national level for info purposes."),
-                   tags$p("All covid data is taken from Public Health Scotland: Daily Trends, xxxxxxxx"),
-                   tags$p("Population data is taken from"),
-                   tags$p("Localities are taken from XXXX and are calculated and about this"),
+                   tags$p("This app has been designed and hard coded using R Shiny to give insight and visualisation into East Lothain data related to Covid-19."),
+                   tags$p("The app is updated daily as per Public Health Scotland Data Releases
+                                 (data at Local Authority level is released after 2 days).  Data Totals are cumulative numbers since 28th February 2020 as per Public Health Scotland Data.
+                          Hospital Data is only available from September 2020.  Vaccination and Hospital Data not available at local authority level.  Vaccination and Hospital data is included at national level for info purposes."),
+                   tags$p(h5("All covid data is provided by Public Health Scotland: "), uiOutput("daily_url"), " Daily Case Trends By Local Authority, Daily Case Trends By Neighbourhood",
+                   uiOutput("trends_url"), " Trends in daily COVID-19 data"),
+                   tags$p(h5("Population Figures"), "Locality and national population data is also taken from 'Daily Case Trends By Neighbourhood'.  This is an estimate of population from National Records of Scotland as per June 2019."),
+                   tags$p(h5("Scottish Locality Spatial data is taken from:  "), uiOutput("spatial_url"), "Intermediate Zone Boundaries 2011 (
+                          The localities / Intermediate Zones were designed to meet constraints on population thresholds (2,500 - 6,000 household residents), based on the UK 2011 Census,  and nest within local authorities.
+There are 1,279 Intermediate Zones (localities) covering the whole of Scotland.)")
                    )),
                    column(4,
-                          tags$div(img(class = "symbol", src="east_lothian.jpg")))
-        ),
-        div(class="large_div"))),
+                          tags$div(img(class = "symbol", src="east_lothian.jpg"))
+        )),
+        div(class="large_div")
+        )),
         div(class = "separator"),
-        tags$footer(class = "footer_text", paste0("Produced by Kerr McIntosh \n"), uiOutput("github"),
+        tags$footer(class = "footer_text", uiOutput("github"), uiOutput("linkedin"),
                     tags$div(class = "separator"))
             
         )
- 
