@@ -57,7 +57,7 @@ server <- function(input, output) {
           ) +
           # plot.margin = unit(x = c(0.5, 0, 0, 0), units = "cm"),
     geom_text(aes(label = prettyNum(CumulativeTotals, big.mark=",",scientific=FALSE)), vjust = -0.5, size = 6) +
-    scale_x_discrete(expand = c(0.1, 0), labels = c("Total Positive Cases", "Total Deaths")) +
+    scale_x_discrete(expand = c(0.1, 0), labels = c("Positive Cases", "Deaths")) +
     # labs(title = "Total Cases & Deaths") +
     coord_cartesian(clip = "off") 
   })
@@ -72,6 +72,7 @@ server <- function(input, output) {
       filter(Stats == input$la_line_plot) %>% 
       ggplot() +
       geom_line(aes(x= Date, y = Numbers, colour = Region)) + 
+      # stat_smooth(aes(x= Date, y = Numbers), inherit.aes = FALSE) +
       theme_classic() +
       scale_colour_manual(values = c("#998ec3","#e08214")) +
       scale_x_date(date_labels = "%b %y", date_breaks = "1 month") +
@@ -111,7 +112,7 @@ server <- function(input, output) {
 
         ) +
         geom_text(aes(label = prettyNum(CumulativeTotals, big.mark=",",scientific=FALSE)), vjust = -0.5, size = 6) +
-        scale_x_discrete(expand = c(0.1, 0), labels = c("Total Positive Cases", "Total Deaths")) +
+        scale_x_discrete(expand = c(0.1, 0), labels = c("Positive Cases", "Deaths")) +
         coord_cartesian(clip = "off") 
     })
     
