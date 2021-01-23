@@ -1,5 +1,6 @@
 # TO DO - link csv direct from web and filter  most recent date
 # why crude rates for region from IZ and CA dataset different... Check!
+# sum of regions vs cuml data ... seems to be same as day before  ASK ASK
 # detail where population taken from
 
 
@@ -12,10 +13,26 @@ library(ggiraph)
 library(readxl)
 library(shiny)
 
-#Pull in covid data
+# 1 Pull in local authority locality data data
+
 locality_data <- read_csv("data/trend_iz.csv", 
                           col_types = cols(CrudeRate7DayPositive = col_character(), Positive7Day = col_integer())) %>% 
   mutate(Date = ymd(as.character(Date))) 
+# 2 Pull in local authority data data
+la_data <- read_csv("data/trend_ca.csv") %>% 
+  select(-c(DailyNegative, CrudeRate7DayPositive)) %>% 
+  mutate(Date = ymd(as.character(Date)))
+#3 Scottish Cumulative Dates
+national_cuml_data <- read_csv("data/daily_cuml_scot.csv") %>% 
+  mutate(Date = ymd(as.character(Date))) %>% 
+  mutate(Region = "Scotland") %>% 
+  select(Date, Region, DailyCases, CumulativeCases, Deaths)
+#4 Hospital Data
+hospitalisation_data <- read_excel("data/trends.xlsx", sheet = "Table 2 - Hospital Care", skip = 2) 
+#5 Vax Data
+vax_icu_data <- read_excel("data/trends.xlsx", sheet = "Table 10 - Vaccinations", skip = 2) %>% 
+  rename("FirstDose" = "Number of people who have received the first dose of the Covid vaccination", "SecondDose" = "Number of people who have received the second dose of the Covid vaccination" )
+
 
 date_working <- locality_data %>% 
   select(Date) %>% 
@@ -25,6 +42,12 @@ app_date <- locality_data %>%
   select(Date) %>% 
   arrange(desc(Date)) %>% 
   head(1) 
+#Make sure all spreadsheets to app date
+la_data <- la_data %>% 
+  filter(Date <= app_date)
+
+
+  
 
 head_date <- date_working$Date %>% 
   format('%d/%m/%y')
@@ -50,7 +73,6 @@ el_data$CrudeRate7DayPositive<- factor(el_data$CrudeRate7DayPositive, levels = c
 unique(el_data$CrudeRate7DayPositive)
 class(el_data$CrudeRate7DayPositive)
 
-el_data %>% write_csv("data_check.csv")
 # Bring in Spatial Data and join Covid data
 el_map <- st_read("data/shape_files/SG_IntermediateZoneBdry_2011/") 
 el_map <- left_join(el_map, el_data) %>% 
@@ -73,8 +95,6 @@ tooltip_css <- "background-color:#9c9a98;
 
 #---------------PLOT 2 ---------------------
 
-la_data <- read_csv("data/trend_ca.csv") %>% 
-  mutate(Date = ymd(as.character(Date)))
 
 
 
@@ -92,7 +112,7 @@ county_cumulative <- la_data %>%
 #------------------PLOT 3
 
 totals_data <- la_data  %>% 
-  select(-c(CumulativeNegative , CrudeRateNegative, PositiveTests, PositivePercentage, TotalPillar1, TotalPillar2, CrudeRateDeaths, CrudeRatePositive))
+  select(-c(CumulativeNegative , CrudeRateNegative, PositiveTests, PositivePercentage7Day, PositivePercentage, TotalPillar1, TotalPillar2, CrudeRateDeaths, CrudeRatePositive))
 
 colnames(locality_data)
 population <- locality_data %>% 
@@ -154,10 +174,7 @@ scot_test_data <- la_data %>%
   group_by(Date) %>% 
   summarize (TotalTests = sum(TotalTests))
 
-national_cuml_data <- read_csv("data/daily_cuml_scot_20210116.csv") %>% 
-  mutate(Date = ymd(as.character(Date))) %>% 
-  mutate(Region = "Scotland") %>% 
-  select(Date, Region, DailyCases, CumulativeCases, Deaths)
+
 
 national_cuml_data <- left_join(national_cuml_data, scot_test_data, by ="Date")
 
@@ -166,10 +183,15 @@ CovidTime <- totals_data %>%
   select(-c(CA, CumulativeDeaths)) %>% 
   rename(DailyCases = DailyPositive, CumulativeCases = CumulativePositive, Region = CAName, Deaths = DailyDeaths)
 
+colnames(CovidTime)
+scot_cuml_time <- CovidTime %>% 
+  group_by(Date) %>% 
+  summarise(DailyCases = sum(DailyCases), Deaths = sum(Deaths), TotalTests = sum(TotalTests), CumulativeCases = sum(CumulativeCases)) %>% 
+  mutate(Region = "Scotland")
 
 # Add Data daily and cumulative cases, deaths - Scotland and Local Authority Regions
-CovidTime <- rbind(CovidTime, national_cuml_data) %>% 
-  filter(Region == "East Lothian" | Region == "Scotland") 
+CovidTime <- rbind(CovidTime, scot_cuml_time) %>%
+  filter(Region == "East Lothian" | Region == "Scotland")
 
 CovidTimeLine <-  CovidTime %>% 
   select(-CumulativeCases) %>% 
@@ -192,7 +214,7 @@ scot_total <- CovidTime %>%
 
 #-------------SCOT STATS _______________
 totals_data <- la_data  %>% 
-  select(-c(CumulativeNegative , CrudeRateNegative, PositiveTests, PositivePercentage, TotalPillar1, TotalPillar2, CrudeRateDeaths, CrudeRatePositive))
+  select(-c(CumulativeNegative , CrudeRateNegative, PositiveTests, PositivePercentage7Day, TotalPillar1, TotalPillar2, CrudeRateDeaths, CrudeRatePositive))
 
 colnames(locality_data)
 population <- locality_data %>% 
@@ -240,14 +262,13 @@ total_tests_today = sum(la_data$TotalTests)
 
 #---------hospitalisation rates ---------------------------------------
 
-hospitalisation_data <- read_excel("data/COVID-19+daily_data_trends.xlsx", sheet = "Table 2 - Hospital Care", skip = 2) 
-# rename("FirstDose" = "Number of people who have received the first dose of the Covid vaccination", "SecondDose" = "Number of people who have received the second dose of the Covid vaccination" )
 
 
 hospitalisation_data <- hospitalisation_data %>% 
   janitor::clean_names() %>% 
   rename("icu_covid" = "x_i_covid_19_patients_in_icu_or_combined_icu_hdu" , "all_hospital" = "ii_covid_19_patients_in_hospital_including_those_in_icu" ) %>% 
   mutate(date = ymd(as.character(str_sub(reporting_date, 1, 10))))  %>% 
+  filter(date <= app_date) %>% 
   arrange(desc(date)) %>% 
   select(-reporting_date) %>% 
   pivot_longer(cols =c(all_hospital, icu_covid),
@@ -257,12 +278,11 @@ hospitalisation_data <- hospitalisation_data %>%
 
 #--------- Vax Data
 
-vax_icu_data <- read_excel("data/COVID-19+daily_data_trends.xlsx", sheet = "Table 10 - Vaccinations", skip = 2) %>% 
-  rename("FirstDose" = "Number of people who have received the first dose of the Covid vaccination", "SecondDose" = "Number of people who have received the second dose of the Covid vaccination" )
 head(vax_icu_data)
 class(vax_icu_data$Date)
 vax_icu_data <- vax_icu_data %>% 
   mutate(Date = as.character(vax_icu_data$Date)) %>% 
+  filter(Date <= app_date) %>% 
   arrange(desc(Date)) %>% 
   top_n(1) %>% 
   mutate(propotion_first = round((FirstDose/scot_population)*100, 1),

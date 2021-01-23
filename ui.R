@@ -16,7 +16,7 @@ ui <- fluidPage(
         tabPanel("Dashboard", div(class = "separator"),
                  fluidRow(
                    column(8,
-                          tags$h6(class ="padLeft", textOutput("map_title")),
+                          div(class ="box_head", h6(class ="white_center", textOutput("map_title"))),
                           girafeOutput("map")),
                    column(4, style='padding-right:40px;', 
                           fluidRow(                            div(class ="box_head", h6(class ="white", "East Lothian Daily Stats: ", head_date)),
@@ -27,8 +27,9 @@ ui <- fluidPage(
                                                                    htmlOutput("el_crude"), 
                                                                    htmlOutput("el_sevenday")
                                                                ),
-                            tags$h6(textOutput("bar_title")),
-                          div(plotOutput("el_bar", height = 350))
+                                                               div(class ="box_head", h6(class ="white", "East Lothian Total Cases & Deaths")),
+                                                               div(class="box",
+                          div(plotOutput("el_bar", height = 350)))
                           )
 
                           )
@@ -36,7 +37,7 @@ ui <- fluidPage(
                           ),
                  fluidRow(
                    div(class = "line"), 
-                   tags$h6(class ="padLeft2", textOutput("la_line_title")),
+                   div(class ="box_head_90", tags$h6(class ="white_center", textOutput("la_line_title"))),
                           column(2,class ="radio_buttontop",
                                         tags$div(class ="radio_button",
                                                  radioButtons("la_line_plot",
@@ -59,14 +60,17 @@ ui <- fluidPage(
                                                                    htmlOutput("scot_crude"), 
                                                                    htmlOutput("scot_sevenday")
                                                                ),
-                          h6("Scottish Cumulative Cases and Deaths"),
-                          div(plotOutput("scot_bar", height = 255))),
+                          div(class ="box_head", h6(class ="white", "Total Scottish Cases & Deaths")),
+                          div(class="box",
+                          div(plotOutput("scot_bar", height = 255)))),
                    column(6, 
-                          h6(class ="padLeft", "Covid Hospitalisation and ICU Numbers"),
+                          div(class ="box_head", h6(class ="white_center", "Covid Hospitalisation and ICU Numbers")),
+                          # h6(class ="padLeft", "Covid Hospitalisation and ICU Numbers"),
                           plotlyOutput("hospitalisation")),
                    column(3, style='padding-right:40px;', 
-                          h6("Proportion of Scottish Population who have received First Dose of Vaccination"),
-                          plotOutput("vax_one", height = 275),
+                          div(class ="box_head_pie", h6(class ="white", "Proportion of Scottish Population who have received First Dose of Vaccination")),
+                          div(class="box_pie",
+                          plotOutput("vax_one", height = 275)),
                           div(class ="box_head", h6(class ="white", "Vaccination Stats")),
                           div(class="box",
                               htmlOutput("had_vax_one"), 
@@ -83,12 +87,13 @@ ui <- fluidPage(
                    div(class = "about_us",
                    tags$h6("About This App"),
                    tags$p("This app has been designed using R Shiny to give insight and visualisation into East Lothain data related to Covid-19."),
-                   tags$p("The app is updated daily and is updated as per Public Health Scotland Data Releases 
-                                 (data at Local Authority level is released after 2 days)"),
+                   tags$p("The app is updated daily as per Public Health Scotland Data Releases 
+                                 (data at Local Authority level is released after 2 days).  Data Totals are cumulative numbers since 28th February 2020 as per Public Health Scotland Data. 
+                          Hospital Data is only available from September 2020.  Vaccination and Hospital Data not available at local authority level.  Data is included at national level for info purposes."),
                    tags$p("All covid data is taken from Public Health Scotland: Daily Trends, xxxxxxxx"),
                    tags$p("Population data is taken from"),
                    tags$p("Localities are taken from XXXX and are calculated and about this"),
-                   tags$p("Hospital Data is only available from September 2020.  Vaccination and Hospital Data not available at local authority level.  Data is included at national level for info purposes."))),
+                   )),
                    column(4,
                           tags$div(img(class = "symbol", src="east_lothian.jpg")))
         ),

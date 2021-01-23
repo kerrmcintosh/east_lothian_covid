@@ -63,7 +63,7 @@ server <- function(input, output) {
   })
   
   output$la_line_title<- renderText({
-    paste0(input$la_line_plot ," Over Time")
+    paste0(input$la_line_plot ," Over Time: East Lothian vs Scotland")
   })
 
   output$la_line <- renderPlotly({  
@@ -140,11 +140,11 @@ server <- function(input, output) {
     })
     
     output$scot_deaths<- renderText({
-      paste0("<b>Deaths: </b>", scot_total$DailyDeaths)
+      paste0("<b>Deaths: </b>", scot_total$Deaths)
     })
     
     output$scot_tests<- renderText({
-      paste0("<b>Tests: </b>", scot_total$TotalTests)
+      paste0("<b>Tests: </b>", prettyNum(scot_total$TotalTests, big.mark=",",scientific=FALSE))
     })
     
     output$scot_crude<- renderText({

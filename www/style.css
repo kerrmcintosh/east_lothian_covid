@@ -9,7 +9,7 @@ body {
 
 .line {
   width: 80%;
-  border-top: 1px solid #DCDCDC;
+  border-top: 1px solid #8c96c6;
   margin: 0 auto 20px auto;
 }
 
@@ -22,12 +22,8 @@ body {
 
 }
 
-.padLeft {
-  padding-left: 10%;
-}
-.padLeft2 {
-  padding-left: 17%;
-}
+
+
 
 .vcenter {
   height: 40px;
@@ -37,6 +33,11 @@ body {
   padding-left:20px;
 }
 
+
+.white_center {
+  color: #ffffff;
+  margin: 0 auto;
+}
 
 .white {
   color: #ffffff;
@@ -51,6 +52,57 @@ body {
 .box_head {
   background-color: #8c96c6;
   height: 30px;  
+  line-height: 30px;
+  padding-left: 10px;
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.box_head_90 {
+  background-color: #8c96c6;
+  height: 30px;  
+  line-height: 30px;
+  padding-left: 10px;
+  display: flex;
+  align-items: center;
+  width: 90%;
+  margin: 15px auto 0 auto;
+}
+
+.center {
+    align-items: center;
+}
+.box_head_left {
+    background-color: #8c96c6;
+  height: 30px;  
+  line-height: 30px;
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+  padding-left: 10%;
+}
+
+.box_head_left2 {
+    background-color: #8c96c6;
+  height: 30px;  
+  line-height: 30px;
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+  text-align: center;
+
+}
+
+.box_pie {
+  border: 1px solid #8c96c6;
+    margin-bottom: 30px;
+    padding-top: 10px;
+
+}
+
+.box_head_pie {
+  background-color: #8c96c6;
   line-height: 30px;
   padding-left: 10px;
   display: flex;
