@@ -137,11 +137,11 @@ server <- function(input, output) {
     })
   
     output$scot_cases<- renderText({
-      paste0("<b>New Cases: </b>",prettyNum(scot_total$DailyCases, big.mark=",",scientific=FALSE))
+      paste0("<b>New Cases: </b>",prettyNum(scot_total$DailyPositive, big.mark=",",scientific=FALSE))
     })
     
     output$scot_deaths<- renderText({
-      paste0("<b>Deaths: </b>", scot_total$Deaths)
+      paste0("<b>Deaths: </b>", scot_total$DailyDeaths)
     })
     
     output$scot_tests<- renderText({

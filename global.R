@@ -22,6 +22,7 @@ locality_data <- read_csv("data/trend_iz.csv",
 la_data <- read_csv("data/trend_ca.csv") %>% 
   select(-c(DailyNegative, CrudeRate7DayPositive)) %>% 
   mutate(Date = ymd(as.character(Date)))
+colnames(la_data)
 #3 Scottish Cumulative Dates
 national_cuml_data <- read_csv("data/daily_cuml_scot.csv") %>% 
   mutate(Date = ymd(as.character(Date))) %>% 
@@ -140,14 +141,17 @@ region_total_crude <- left_join(region_total_crude, population, by ="CAName")
 
 region_multiplier <- 100000/head(as.numeric(region_total_crude$population),1)
 
-
+colnames(totals_data)
 scot_total_crude <- totals_data %>%
   group_by(Date) %>% 
-  summarise(DailyPositive = sum(DailyPositive)) %>% 
+  summarise(DailyPositive = sum(DailyPositive), DailyDeaths = sum(DailyDeaths), TotalTests = sum(TotalTests)) %>% 
   arrange(desc(Date)) %>% 
   slice_max(Date, n = 7) 
 
 scot_multiplier <- 100000/head(as.numeric(scot_population),1)
+
+scot_total <- scot_total_crude %>% 
+  slice_max(Date, n = 1) 
 
 
 el_crude_today <- sum(region_total_crude$DailyPositive) *region_multiplier
@@ -209,10 +213,10 @@ el_daily <- totals_data %>%
   filter(Date == app_date) %>%
   filter(CAName == "East Lothian")
 
-scot_total <- CovidTime %>% 
-  mutate(DailyDeaths = Deaths - lag(Deaths,1)) %>% 
-  filter(Date == app_date) %>%
-  filter(Region == "Scotland") 
+# scot_total <- CovidTime %>% 
+#   mutate(DailyDeaths = Deaths - lag(Deaths,1)) %>% 
+#   filter(Date == app_date) %>%
+#   filter(Region == "Scotland") 
 
 #-------------SCOT STATS _______________
 totals_data <- la_data  %>% 
@@ -230,6 +234,10 @@ total_tests <- sum(totals_data$TotalTests)
 scot_pos <- sum(totals_data$DailyPositive)
 scot_deaths <- sum(totals_data$DailyDeaths)
 
+# totals_data %>% 
+#   group_by(Date) %>%
+#   summarise(D = sum(CumulativeDeaths), C = sum(CumulativePositive)) %>% 
+#   slice_max(Date, n = 1) 
 
 scot_cumulative <-  totals_data %>% 
   summarise(scot_pos = sum(DailyPositive), scot_deaths = sum(DailyDeaths)) %>% 
