@@ -23,7 +23,9 @@ body {
 
 }
 
-
+.head_right {
+float: right;
+}
 
 
 .vcenter {

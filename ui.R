@@ -9,7 +9,7 @@ ui <- fluidPage(
   
   tags$div( 
   #or titlePanel("Hello Shiny!")
-      tags$h3("East Lothian Covid-19 Tracker (", head_date_title, ")")),
+      tags$h3(class = "head_left", "East Lothian Covid-19 Tracker"), h6(class = "head_right", Head_title_date)),
      
       tabsetPanel(
         #tab 1
@@ -49,7 +49,7 @@ ui <- fluidPage(
                  column(10, 
                         plotlyOutput("la_line"))),
                  fluidRow(div(class ="shade",
-                   tags$h3(class="vcenter", "National Picture in Scotland")),
+                   tags$h3(class="vcenter", "National Picture in Scotland, ", Head_title_date)),
                    fluidRow(
                    column(3, style='padding-left: 40px;',
 

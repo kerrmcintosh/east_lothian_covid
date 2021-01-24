@@ -1,9 +1,5 @@
-# TO DO - link csv direct from web and filter  most recent date
+
 # why crude rates for region from IZ and CA dataset different... Check!
-# sum of regions vs cuml data ... seems to be same as day before  ASK ASK
-# detail where population taken from
-
-
 
 library(tidyverse)
 library(plotly)
@@ -13,48 +9,54 @@ library(ggiraph)
 library(readxl)
 library(shiny)
 
-# 1 Pull in local authority locality data data
+# 1 Pull in locality data data
+
 
 locality_data <- read_csv("data/trend_iz.csv", 
                           col_types = cols(CrudeRate7DayPositive = col_character(), Positive7Day = col_integer())) %>% 
   mutate(Date = ymd(as.character(Date))) 
+
 # 2 Pull in local authority data data
 la_data <- read_csv("data/trend_ca.csv") %>% 
   select(-c(DailyNegative, CrudeRate7DayPositive)) %>% 
   mutate(Date = ymd(as.character(Date)))
-colnames(la_data)
-#3 Scottish Cumulative Dates
-national_cuml_data <- read_csv("data/daily_cuml_scot.csv") %>% 
-  mutate(Date = ymd(as.character(Date))) %>% 
-  mutate(Region = "Scotland") %>% 
-  select(Date, Region, DailyCases, CumulativeCases, Deaths)
+
+#3 Scottish Cumulative Dates - not using
+national_total_data <- read_csv("data/daily_cuml_scot.csv") %>%
+  mutate(Date = ymd(as.character(Date)))
+
 #4 Hospital Data
 hospitalisation_data <- read_excel("data/trends.xlsx", sheet = "Table 2 - Hospital Care", skip = 2) 
 #5 Vax Data
 vax_icu_data <- read_excel("data/trends.xlsx", sheet = "Table 10 - Vaccinations", skip = 2) %>% 
   rename("FirstDose" = "Number of people who have received the first dose of the Covid vaccination", "SecondDose" = "Number of people who have received the second dose of the Covid vaccination" )
 
+#locality data is 3 days behind - so to make sure - using same date
 
-date_working <- locality_data %>% 
+app_date <- la_data %>% 
   select(Date) %>% 
   arrange(desc(Date)) %>% 
   head(1) 
-app_date <- locality_data %>% 
-  select(Date) %>% 
-  arrange(desc(Date)) %>% 
-  head(1) 
-#Make sure all spreadsheets to app date
-la_data <- la_data %>% 
-  filter(Date <= app_date)
+#Make sure locality data to app date
+# la_data <- la_data %>% 
+#   filter(Date <= app_date)
 
 
-  
-
-head_date <- date_working$Date %>% 
+head_date <- app_date$Date %>% 
   format('%d/%m/%y')
 
-head_date_title <- date_working$Date %>% 
+Head_title_date <- app_date$Date %>% 
   format('%d %B %Y')
+
+local_date <- locality_data %>% 
+  select(Date) %>% 
+  arrange(desc(Date))  %>% 
+  head(1)
+
+local_date_title <- local_date$Date %>% 
+  format('%d %B %Y')
+
+head_date_tile <- local_date_title
 la_regions <- unique(locality_data$CAName)
 
 
@@ -66,9 +68,7 @@ el_data <- locality_data %>%
   mutate(multiplier = 100000/Population) %>% 
   mutate(Positive7Day = ifelse(is.na(Positive7Day), 0, Positive7Day)) %>% 
   mutate(real_rate_per_OT = round(multiplier*Positive7Day))
-# el_data %>% 
-#   filter(CAName == "East Lothian") %>% 
-#   filter(Date > (app_date-7)) 
+
 #Convert crude rate to ordered factor
 el_data$CrudeRate7DayPositive<- factor(el_data$CrudeRate7DayPositive, levels = c(0, "1 to 49", "50 to 99", "100 to 199", "200 to 399", "400+"))
 unique(el_data$CrudeRate7DayPositive)
@@ -86,10 +86,9 @@ el_map <- left_join(el_map, el_data) %>%
     wow < 0 ~ "less than 7 days previous",
     wow > 0 ~ "more than 7 days previous",
     TRUE ~ "No change on 7 days previous")
-  )   %>% 
-  filter(Date == "2021-01-01") 
+  )  %>% 
+  filter(Date == local_date)
 
-el_7day <- sum(el_map$Positive7Day)
 
 tooltip_css <- "background-color:#d9d9d9; 
                 color: #000000;
@@ -119,7 +118,7 @@ totals_data <- la_data  %>%
 
 colnames(locality_data)
 population <- locality_data %>% 
-  filter(Date == app_date) %>% 
+  filter(Date == local_date) %>% 
   group_by(CAName) %>% 
   summarise(population = sum(Population))
 
@@ -134,7 +133,6 @@ region_total_crude <- totals_data %>%
   arrange(desc(Date)) %>% 
   slice_max(Date, n = 7) %>% 
   mutate(CAName = as.character(CAName)) 
-
 
 region_total_crude$CAName = as.character(region_total_crude$CAName)
 region_total_crude <- left_join(region_total_crude, population, by ="CAName")
@@ -182,7 +180,7 @@ scot_test_data <- la_data %>%
 
 
 
-national_cuml_data <- left_join(national_cuml_data, scot_test_data, by ="Date")
+# national_cuml_data <- left_join(national_cuml_data, scot_test_data, by ="Date")
 
 
 CovidTime <- totals_data %>% 
@@ -224,7 +222,7 @@ totals_data <- la_data  %>%
 
 colnames(locality_data)
 population <- locality_data %>% 
-  filter(Date == app_date) %>% 
+  filter(Date == local_date) %>% 
   group_by(CAName) %>% 
   summarise(population = sum(Population))
 
@@ -265,10 +263,17 @@ scot_total_crude <- totals_data %>%
 
 scot_multiplier <- 100000/head(as.numeric(scot_population),1)
 
-
-el_crude_today <- sum(region_total_crude$DailyPositive) *region_multiplier
+el_7day <- sum(region_total_crude$DailyPositive)
+el_crude_today <- el_7day *region_multiplier
 scot_crude_today <- sum(scot_total_crude$DailyPositive) *scot_multiplier
 total_tests_today = sum(la_data$TotalTests)
+
+national_total_data <- national_total_data %>% 
+  filter(Date == app_date) %>% 
+  pivot_longer(cols =c(CumulativeCases, Deaths),
+               names_to = "Stats",
+               values_to = "CumulativeTotals")
+
 
 #---------hospitalisation rates ---------------------------------------
 

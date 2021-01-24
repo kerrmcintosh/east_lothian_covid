@@ -16,14 +16,15 @@ server <- function(input, output) {
         scale_fill_brewer(palette = "Purples") +
         theme_void() +
         geom_text(x=10, y=30, label="Scatter plot") +
-        labs(subtitle = "Click map for locality info" ,fill = "Infections per 100,000 \n(Crude Rate)") +
+        labs(title = "Click map for locality info", subtitle = paste("*Locality Data is to ", local_date_title) ,fill = "Infections per 100,000 \n(Crude Rate)") +
         guides(shape = guide_legend(override.aes = list(size = 1)),
                color = guide_legend(override.aes = list(size = 1))) +
         theme(legend.title = element_text(size = 7), 
               legend.text = element_text(size = 5),
               legend.position = c(.9,.9),
               plot.margin = margin(0, 0, 0, 0, "cm"),
-              plot.subtitle = element_text(size = 10, face = "italic", colour = "#696969"))
+              plot.title = element_text(size = 11, face = "italic", colour = "#696969"),
+              plot.subtitle = element_text(size = 9))
       map <- girafe(ggobj = gg) 
       # x <- ggiraphOutput(height = .5, width = 1)
       map <- girafe_options(map,
@@ -96,7 +97,7 @@ server <- function(input, output) {
     })
   
     output$scot_bar <- renderPlot({
-      ggplot(scot_cumulative) +
+      ggplot(national_total_data) +
         aes(y=CumulativeTotals, x = Stats, fill = Stats) +
         geom_col() +
         scale_fill_manual(values = c("#bcbddc", "#88419d")) +
@@ -164,7 +165,7 @@ server <- function(input, output) {
                 axis.title.x = element_blank(),
                 axis.title.y = element_blank()) )
       
-      hospitalisation_data %>%  layout(legend = list(orientation = 'v', x = 0.1, y = 0.95))
+      hospitalisation_data %>%  layout(legend = list(orientation = 'v', x = 0.1, y = 0.93))
       
     })
     output$vax_one <- renderPlot({
