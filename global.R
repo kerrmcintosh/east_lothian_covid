@@ -1,5 +1,5 @@
 
-# why crude rates for region from IZ and CA dataset different... Check!
+# why crude rates for region from IZ and CA dataset different... eg 21/01 cases. Neighbourhood 100, local authority: 111
 
 library(tidyverse)
 library(plotly)
@@ -150,7 +150,6 @@ scot_multiplier <- 100000/head(as.numeric(scot_population),1)
 
 scot_total <- scot_total_crude %>% 
   slice_max(Date, n = 1) 
-
 
 el_crude_today <- sum(region_total_crude$DailyPositive) *region_multiplier
 scot_crude_today <- sum(scot_total_crude$DailyPositive) *scot_multiplier
