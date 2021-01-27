@@ -193,6 +193,12 @@ font-size :1.6REM;
 
 }
 
+.h7 {
+font-size :1.3REM;
+  color: #696969;
+
+}
+
 .about_us {
   margin: 30px 0 10px 30px;
 }

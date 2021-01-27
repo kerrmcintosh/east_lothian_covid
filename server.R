@@ -3,7 +3,7 @@
 server <- function(input, output) {
   
   output$map_title<- renderText({
-    paste0("East Lothian Locality Covid Picture")
+    paste0("East Lothian Locality Covid Picture: ", local_box_date)
   })
   
   output$map <- renderGirafe({
@@ -16,7 +16,7 @@ server <- function(input, output) {
         scale_fill_brewer(palette = "Purples") +
         theme_void() +
         geom_text(x=10, y=30, label="Scatter plot") +
-        labs(title = "Click map for locality info", subtitle = paste("*Locality Data is to ", local_date_title) ,fill = "Infections per 100,000 \n(Crude Rate)") +
+        labs(title = "Click map for locality info" ,fill = "Infections per 100,000 \n(Crude Rate)") +
         guides(shape = guide_legend(override.aes = list(size = 1)),
                color = guide_legend(override.aes = list(size = 1))) +
         theme(legend.title = element_text(size = 7), 
@@ -137,16 +137,29 @@ server <- function(input, output) {
       paste0("<b>Crude Infection Rate: </b>", round(el_crude_today), " per 100,000 over previous 7 days")
     })
   
+    # output$scot_cases<- renderText({
+    #   paste0("<b>New Cases: </b>",prettyNum(scot_total$DailyPositive, big.mark=",",scientific=FALSE))
+    # })
+    
     output$scot_cases<- renderText({
-      paste0("<b>New Cases: </b>",prettyNum(scot_total$DailyPositive, big.mark=",",scientific=FALSE))
+      paste0("<b>New Cases: </b>",prettyNum(1330, big.mark=",",scientific=FALSE))
     })
+    
+    # output$scot_deaths<- renderText({
+    #   paste0("<b>Deaths: </b>", scot_total$DailyDeaths)
+    # })
     
     output$scot_deaths<- renderText({
-      paste0("<b>Deaths: </b>", scot_total$DailyDeaths)
+      paste0("<b>Deaths: </b>", 92)
     })
     
+    # output$scot_tests<- renderText({
+    #   paste0("<b>Tests: </b>", prettyNum(scot_total$TotalTests, big.mark=",",scientific=FALSE))
+    # })
+    # 
+    
     output$scot_tests<- renderText({
-      paste0("<b>Tests: </b>", prettyNum(scot_total$TotalTests, big.mark=",",scientific=FALSE))
+      paste0("<b>Tests: </b>", prettyNum(26551, big.mark=",",scientific=FALSE))
     })
     
     output$scot_crude<- renderText({
@@ -181,11 +194,11 @@ server <- function(input, output) {
     })
    
     output$had_vax_one<- renderText({
-      paste0(prettyNum(vax_icu_data$FirstDose, big.mark=",",scientific=FALSE), " have had first dose")
+      paste0(prettyNum(vax_data$FirstDose, big.mark=",",scientific=FALSE), " have had first dose")
     }) 
 
     output$had_vax_two<- renderText({
-      paste0(prettyNum(vax_icu_data$SecondDose, big.mark=",",scientific=FALSE), " have had second dose (", vax_icu_data$propotion_second,"%)")
+      paste0(prettyNum(vax_data$SecondDose, big.mark=",",scientific=FALSE), " have had second dose (", vax_data$propotion_second,"%)")
     }) 
     
     output$github <- renderUI({

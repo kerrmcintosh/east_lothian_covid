@@ -28,9 +28,8 @@ national_total_data <- read_csv("data/daily_cuml_scot.csv") %>%
 #4 Hospital Data
 hospitalisation_data <- read_excel("data/trends.xlsx", sheet = "Table 2 - Hospital Care", skip = 2) 
 #5 Vax Data
-vax_icu_data <- read_excel("data/trends.xlsx", sheet = "Table 10 - Vaccinations", skip = 2) %>% 
+vax_data <- read_excel("data/trends.xlsx", sheet = "Table 10a - Vaccinations", skip = 2) %>% 
   rename("FirstDose" = "Number of people who have received the first dose of the Covid vaccination", "SecondDose" = "Number of people who have received the second dose of the Covid vaccination" )
-
 #locality data is 3 days behind - so to make sure - using same date
 
 app_date <- la_data %>% 
@@ -45,13 +44,16 @@ app_date <- la_data %>%
 head_date <- app_date$Date %>% 
   format('%d/%m/%y')
 
-Head_title_date <- app_date$Date %>% 
+Head_title_date <- today() %>% 
   format('%d %B %Y')
 
 local_date <- locality_data %>% 
   select(Date) %>% 
   arrange(desc(Date))  %>% 
   head(1)
+
+local_box_date <- local_date$Date  %>% 
+  format('%d/%m/%y')
 
 local_date_title <- local_date$Date %>% 
   format('%d %B %Y')
@@ -103,7 +105,7 @@ tooltip_css <- "background-color:#d9d9d9;
 county_cumulative <- la_data %>%
   filter(CAName == "East Lothian") %>% 
   select(-c(DailyPositive,DailyDeaths, CA, CAName, TotalTests)) %>% 
-  filter(Date == app_date) %>% 
+  filter(Date == local_date) %>% 
   select(-Date) %>% 
   pivot_longer(cols =c(CumulativePositive, CumulativeDeaths),
                names_to = "Stats",
@@ -130,18 +132,19 @@ scot_deaths <- sum(totals_data$DailyDeaths)
 
 region_total_crude <- totals_data %>%
   filter(CAName == "East Lothian") %>% 
+  filter(Date <= local_date) %>% 
   arrange(desc(Date)) %>% 
   slice_max(Date, n = 7) %>% 
   mutate(CAName = as.character(CAName)) 
 
 region_total_crude$CAName = as.character(region_total_crude$CAName)
 region_total_crude <- left_join(region_total_crude, population, by ="CAName")
-
 region_multiplier <- 100000/head(as.numeric(region_total_crude$population),1)
 
 colnames(totals_data)
 scot_total_crude <- totals_data %>%
   group_by(Date) %>% 
+  filter(Date <= local_date)  %>% 
   summarise(DailyPositive = sum(DailyPositive), DailyDeaths = sum(DailyDeaths), TotalTests = sum(TotalTests)) %>% 
   arrange(desc(Date)) %>% 
   slice_max(Date, n = 7) 
@@ -207,7 +210,7 @@ y_la <- list(
   title = "Daily Cases")
 
 el_daily <- totals_data %>% 
-  filter(Date == app_date) %>%
+  filter(Date == local_date) %>%
   filter(CAName == "East Lothian")
 
 # scot_total <- CovidTime %>% 
@@ -221,11 +224,10 @@ totals_data <- la_data  %>%
 
 colnames(locality_data)
 population <- locality_data %>% 
-  filter(Date == local_date) %>% 
   group_by(CAName) %>% 
   summarise(population = sum(Population))
 
-scot_population <- sum(population$population)
+# scot_population <- sum(population$population)
 
 total_tests <- sum(totals_data$TotalTests)
 scot_pos <- sum(totals_data$DailyPositive)
@@ -245,6 +247,7 @@ scot_cumulative <-  totals_data %>%
   
 region_total_crude <- totals_data %>%
   filter(CAName == "East Lothian") %>% 
+  filter(Date <= local_date) %>% 
   arrange(desc(Date)) %>% 
   slice_max(Date, n = 7) %>% 
   mutate(CAName = as.character(CAName)) 
@@ -253,7 +256,7 @@ region_total_crude <- totals_data %>%
 region_total_crude$CAName = as.character(region_total_crude$CAName)
 region_total_crude <- left_join(region_total_crude, population, by ="CAName")
 
-region_multiplier <- 100000/head(as.numeric(region_total_crude$population),1)
+# region_multiplier <- 100000/head(as.numeric(region_total_crude$population),1)
 scot_total_crude <- totals_data %>%
   group_by(Date) %>% 
   summarise(DailyPositive = sum(DailyPositive)) %>% 
@@ -263,8 +266,8 @@ scot_total_crude <- totals_data %>%
 scot_multiplier <- 100000/head(as.numeric(scot_population),1)
 
 el_7day <- sum(region_total_crude$DailyPositive)
-el_crude_today <- el_7day *region_multiplier
-scot_crude_today <- sum(scot_total_crude$DailyPositive) *scot_multiplier
+# el_crude_today <- el_7day *region_multiplier
+# scot_crude_today <- sum(scot_total_crude$DailyPositive) *scot_multiplier
 total_tests_today = sum(la_data$TotalTests)
 
 national_total_data <- national_total_data %>% 
@@ -292,22 +295,19 @@ hospitalisation_data <- hospitalisation_data %>%
 
 #--------- Vax Data
 
-head(vax_icu_data)
-class(vax_icu_data$Date)
-vax_icu_data <- vax_icu_data %>% 
-  mutate(Date = as.character(vax_icu_data$Date)) %>% 
-  filter(Date <= app_date) %>% 
-  arrange(desc(Date)) %>% 
-  top_n(1) %>% 
+vax_data <- vax_data %>%
+  mutate(Date = as.character(vax_data$Date)) %>%
+  arrange(desc(Date)) %>%
+  top_n(2) %>%
+  arrange(Date) %>%
+  head(1) %>% 
   mutate(propotion_first = round((FirstDose/scot_population)*100, 1),
          propotion_not_first = 100 - propotion_first) %>% 
   mutate(propotion_second = round((SecondDose/scot_population)*100, 1),
          propotion_not_second = 100 - propotion_second)
 
-
-
-vax_icu_data$FirstDose
-first_vax_pie <- vax_icu_data %>% 
+vax_data$FirstDose
+first_vax_pie <- vax_data %>% 
   select(propotion_first, propotion_not_first) %>% 
   pivot_longer(cols =c(propotion_first, propotion_not_first),
                names_to = "split",
@@ -319,7 +319,7 @@ first_vax_pie<- ggplot(first_vax_pie, aes(x="", y=split_numbers, fill=split)) +
   geom_bar(width = 1, stat = "identity")
 
 
-second_vax_pie <- vax_icu_data %>% 
+second_vax_pie <- vax_data %>% 
   select(propotion_second, propotion_not_second) %>% 
   pivot_longer(cols =c(propotion_second, propotion_not_second),
                names_to = "split",
