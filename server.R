@@ -64,15 +64,19 @@ server <- function(input, output) {
   })
   
   output$la_line_title<- renderText({
-    paste0(input$la_line_plot ," Over Time: East Lothian vs Scotland")
+    paste0("Daily ", input$la_line_plot ," Over Time / 7 Day Rolling Average: East Lothian vs Scotland")
   })
 
   output$la_line <- renderPlotly({  
   CovidTime <- ggplotly(
     CovidTimeLine %>% 
       filter(Stats == input$la_line_plot) %>% 
+      filter(RollingStats == case_when(input$la_line_plot == "Cases" ~"RollingCases", 
+                                       input$la_line_plot == "Deaths" ~ "RollingDeaths",
+                                       TRUE ~"RollingTests"))%>% 
       ggplot() +
       geom_line(aes(x= Date, y = Numbers, colour = Region)) + 
+      geom_line(aes(x= Date, y = RollingNumbers, group = Region), colour = "#696969") + 
       # stat_smooth(aes(x= Date, y = Numbers), inherit.aes = FALSE) +
       theme_classic() +
       scale_colour_manual(values = c("#998ec3","#e08214")) +

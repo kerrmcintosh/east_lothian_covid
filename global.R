@@ -199,12 +199,21 @@ scot_cuml_time <- CovidTime %>%
 CovidTime <- rbind(CovidTime, scot_cuml_time) %>%
   filter(Region == "East Lothian" | Region == "Scotland")
 
+  
+  
 CovidTimeLine <-  CovidTime %>% 
   select(-CumulativeCases) %>% 
+  mutate(DailyCases7 = round(zoo::rollmean(DailyCases, k = 7, fill = NA),2),
+         DailyDeaths7 = round(zoo::rollmean(Deaths, k = 7, fill = NA),2),
+         DailyTests7 = round(zoo::rollmean(TotalTests, k = 7, fill = NA),2)) %>% 
   rename(Cases = DailyCases, Tests = TotalTests) %>% 
   pivot_longer(cols =c(Cases, Deaths, Tests),
                names_to = "Stats",
-               values_to = "Numbers") 
+               values_to = "Numbers") %>% 
+  rename(RollingCases = DailyCases7, RollingTests = DailyTests7, RollingDeaths = DailyDeaths7) %>% 
+  pivot_longer(cols =c(RollingCases, RollingDeaths, RollingTests),
+               names_to = "RollingStats",
+               values_to = "RollingNumbers") 
 
 y_la <- list(
   title = "Daily Cases")
