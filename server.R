@@ -140,6 +140,10 @@ server <- function(input, output) {
     output$el_crude<- renderText({
       paste0("<b>Crude Infection Rate: </b>", round(el_crude_today), " per 100,000 over previous 7 days")
     })
+    
+    output$el_vax<- renderText({
+      paste0(("<b>First Dose Vaccinated: </b>"), east_lothian_vax, "% (weekly statistic as of ", weekly_vax_date, ")")
+    })
   
     # output$scot_cases<- renderText({
     #   paste0("<b>New Cases: </b>",prettyNum(scot_total$DailyPositive, big.mark=",",scientific=FALSE))
@@ -205,6 +209,9 @@ server <- function(input, output) {
       paste0(prettyNum(vax_data$SecondDose, big.mark=",",scientific=FALSE), " have had second dose (", vax_data$propotion_second,"%)")
     }) 
     
+    output$over_80_vax<- renderText({
+      paste0(over80_popn, "% of over 80s have been vaccinated (weekly statistic as of ", weekly_vax_date, ")")
+    })
     output$github <- renderUI({
       url <- a("github.com/kerrmcintosh", href="https://www.github.com/kerrmcintosh")
       tagList(url)
@@ -229,6 +236,7 @@ server <- function(input, output) {
       url <- a("Scottish Government SpatialData.gov.scot", href="https://data.gov.uk/dataset/133d4983-c57d-4ded-bc59-390c962ea280/intermediate-zone-boundaries-2011 ")
       tagList(url)
     })
+    
     
     
   }

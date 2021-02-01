@@ -26,7 +26,8 @@ ui <- fluidPage(
                                                                    htmlOutput("el_deaths"), 
                                                                    htmlOutput("el_tests"), 
                                                                    htmlOutput("el_crude"), 
-                                                                   htmlOutput("el_sevenday")
+                                                                   htmlOutput("el_sevenday"),
+                                                                   htmlOutput("el_vax")
                                                                ),
                                                                div(class ="box_head_2line", h6(class ="white", "East Lothian Total Cases & Deaths: ", local_box_date)),
                                                                div(class="box",
@@ -49,7 +50,7 @@ ui <- fluidPage(
                  column(10, 
                         plotlyOutput("la_line"))),
                  fluidRow(div(class ="shade",
-                   tags$h3(class="vcenter", "National Picture in Scotland, ")),
+                   tags$h3(class="vcenter", "National Picture in Scotland")),
                    fluidRow(
                    column(3, style='padding-left: 40px;',
 
@@ -75,7 +76,8 @@ ui <- fluidPage(
                           div(class ="box_head", h6(class ="white", "Vaccination Stats: ", head_date)),
                           div(class="box",
                               htmlOutput("had_vax_one"), 
-                              htmlOutput("had_vax_two") 
+                              htmlOutput("had_vax_two"),
+                              htmlOutput("over_80_vax")
                           )))
                  )
                  
@@ -92,7 +94,8 @@ ui <- fluidPage(
                           Because of delays in reporting, daily figures will be subject to change.  Data at Local Authority level is released after 3 days. A weekly update of historical figures normally takes place every Tuesday. 
                         "),
                    tags$p("Data Totals are cumulative numbers since 28th February 2020 as per Public Health Scotland Data. Death statistics are any death identfied as Covid related.
-                          Hospital Data is only available from September 2020.  Vaccination and Hospital Data not available at local authority level.  Vaccination and Hospital data is included at national level for info purposes."),
+                          Hospital Data is only available from September 2020.  Hospital Data is not available at local authority level.  Hospital data is included at national level for info purposes. Age related and local authority data
+                          is released weekly and hence explains time lag of data shown"),
                    tags$p(h5("All covid data is provided by Public Health Scotland: "), uiOutput("daily_url"), " Daily Case Trends By Local Authority, Daily Case Trends By Neighbourhood, Cumulative Data",
                    uiOutput("trends_url"), " Trends in daily COVID-19 data"),
                    tags$p(h5("Population Figures"), "Locality and national population data is also taken from 'Daily Case Trends By Neighbourhood'.  This is an estimate of population from National Records of Scotland as per June 2019."),
@@ -111,3 +114,5 @@ There are 1,279 Intermediate Zones (localities) covering the whole of Scotland."
                     tags$div(class = "separator"))
             
         )
+
+

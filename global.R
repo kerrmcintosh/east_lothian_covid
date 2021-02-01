@@ -9,6 +9,8 @@ library(ggiraph)
 library(readxl)
 library(shiny)
 
+weekly_vax_date <- "24/01/2021"
+
 # 1 Pull in locality data data
 
 
@@ -200,7 +202,7 @@ CovidTime <- rbind(CovidTime, scot_cuml_time) %>%
   filter(Region == "East Lothian" | Region == "Scotland")
 
   
-  
+  # Rolling 7 day average added
 CovidTimeLine <-  CovidTime %>% 
   select(-CumulativeCases) %>% 
   mutate(DailyCases7 = round(zoo::rollmean(DailyCases, k = 7, fill = NA),2),
@@ -351,3 +353,30 @@ second_vax_pie <- second_vax_pie +
   labs(title = "Proportion of Scottish Population who have\n received Second Dose of Vaccination")
 
 second_vax_pie
+
+
+#Weekly Vax
+
+over_80_popn <- read_csv("data/weekly_vax/popn_2019_age.csv", skip = 2) %>%
+  janitor::clean_names() %>% 
+  select(persons, x80, x81, x82, x83, x84, x85, x86, x87, x88, x89, x90) %>% 
+  filter(persons == "Scotland") %>%
+  select(-persons) %>% 
+  top_n(1)
+over_80_popn$x90 = as.numeric(str_remove(over_80_popn$x90, "[,]"))
+over_80_popn$x88 = as.numeric(str_remove(over_80_popn$x88, "[,]"))
+
+over_80_popn <- rowSums(over_80_popn[,c(1,2,3,4,5,6,7,8,9,10,11)])
+
+vacc_over_80 <- read_csv("data/weekly_vax/vaccination_cuml_agesex.csv") %>% 
+  filter(AgeGroup == "80 years of age and over") %>% 
+  filter(Sex == "Female" | Sex == "Male")
+
+dose1_over80 <- sum(vacc_over_80$NumberVaccinated)
+#weekly over 80 vax proportion
+over80_popn <- round((dose1_over80 / over_80_popn)*100, 0)
+
+
+east_lothian_vax <- read_csv("data/weekly_vax/vaccination_local_authority.csv") %>% 
+  filter(CA == "S12000010")
+east_lothian_vax <- east_lothian_vax$PercentCoverage
