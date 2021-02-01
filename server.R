@@ -142,7 +142,7 @@ server <- function(input, output) {
     # })
     
     output$scot_cases<- renderText({
-      paste0("<b>New Cases: </b>",prettyNum(1330, big.mark=",",scientific=FALSE))
+      paste0("<b>New Cases: </b>",prettyNum(1003, big.mark=",",scientific=FALSE))
     })
     
     # output$scot_deaths<- renderText({
@@ -150,7 +150,7 @@ server <- function(input, output) {
     # })
     
     output$scot_deaths<- renderText({
-      paste0("<b>Deaths: </b>", 92)
+      paste0("<b>Deaths: </b>", 6)
     })
     
     # output$scot_tests<- renderText({
@@ -159,7 +159,7 @@ server <- function(input, output) {
     # 
     
     output$scot_tests<- renderText({
-      paste0("<b>Tests: </b>", prettyNum(26551, big.mark=",",scientific=FALSE))
+      paste0("<b>Tests: </b>", prettyNum(14163, big.mark=",",scientific=FALSE))
     })
     
     output$scot_crude<- renderText({
