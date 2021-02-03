@@ -9,7 +9,7 @@ library(ggiraph)
 library(readxl)
 library(shiny)
 
-weekly_vax_date <- "24/01/2021"
+weekly_vax_date <- "31/01/2021"
 
 # 1 Pull in locality data data
 
@@ -17,12 +17,13 @@ weekly_vax_date <- "24/01/2021"
 locality_data <- read_csv("data/trend_iz.csv", 
                           col_types = cols(CrudeRate7DayPositive = col_character(), Positive7Day = col_integer())) %>% 
   mutate(Date = ymd(as.character(Date))) 
+locality_data <- locality_data[ -1 ]
 
 # 2 Pull in local authority data data
 la_data <- read_csv("data/trend_ca.csv") %>% 
   select(-c(DailyNegative, CrudeRate7DayPositive)) %>% 
   mutate(Date = ymd(as.character(Date)))
-
+la_data <- la_data[ -1 ]
 #3 Scottish Cumulative Dates - not using
 national_total_data <- read_csv("data/daily_cuml_scot.csv") %>%
   mutate(Date = ymd(as.character(Date)))
@@ -376,7 +377,7 @@ dose1_over80 <- sum(vacc_over_80$NumberVaccinated)
 #weekly over 80 vax proportion
 over80_popn <- round((dose1_over80 / over_80_popn)*100, 0)
 
-
+elpopn <- 105790
 east_lothian_vax <- read_csv("data/weekly_vax/vaccination_local_authority.csv") %>% 
   filter(CA == "S12000010")
-east_lothian_vax <- east_lothian_vax$PercentCoverage
+east_lothian_vax <- round((east_lothian_vax$NumberVaccinated / elpopn)*100, 2)

@@ -150,7 +150,7 @@ server <- function(input, output) {
     # })
     
     output$scot_cases<- renderText({
-      paste0("<b>New Cases: </b>",prettyNum(1003, big.mark=",",scientific=FALSE))
+      paste0("<b>New Cases: </b>",prettyNum(978, big.mark=",",scientific=FALSE))
     })
     
     # output$scot_deaths<- renderText({
@@ -158,7 +158,7 @@ server <- function(input, output) {
     # })
     
     output$scot_deaths<- renderText({
-      paste0("<b>Deaths: </b>", 6)
+      paste0("<b>Deaths: </b>", 88)
     })
     
     # output$scot_tests<- renderText({
@@ -167,7 +167,7 @@ server <- function(input, output) {
     # 
     
     output$scot_tests<- renderText({
-      paste0("<b>Tests: </b>", prettyNum(14163, big.mark=",",scientific=FALSE))
+      paste0("<b>Tests: </b>", prettyNum(22807, big.mark=",",scientific=FALSE))
     })
     
     output$scot_crude<- renderText({
@@ -202,15 +202,15 @@ server <- function(input, output) {
     })
    
     output$had_vax_one<- renderText({
-      paste0(prettyNum(vax_data$FirstDose, big.mark=",",scientific=FALSE), " have had first dose")
+      paste0("<b>", prettyNum(vax_data$FirstDose, big.mark=",",scientific=FALSE), "</b> have had first dose")
     }) 
 
     output$had_vax_two<- renderText({
-      paste0(prettyNum(vax_data$SecondDose, big.mark=",",scientific=FALSE), " have had second dose (", vax_data$propotion_second,"%)")
+      paste0("<b>", prettyNum(vax_data$SecondDose, big.mark=",",scientific=FALSE), "</b>  have had second dose (", vax_data$propotion_second,"%)")
     }) 
     
     output$over_80_vax<- renderText({
-      paste0(over80_popn, "% of over 80s have been vaccinated (weekly statistic as of ", weekly_vax_date, ")")
+      paste0("<b>", over80_popn, "%</b> of over 80s have had first dose (weekly statistic as of ", weekly_vax_date, ")")
     })
     output$github <- renderUI({
       url <- a("github.com/kerrmcintosh", href="https://www.github.com/kerrmcintosh")
