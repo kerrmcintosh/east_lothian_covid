@@ -373,8 +373,7 @@ over_80_popn$x88 = as.numeric(str_remove(over_80_popn$x88, "[,]"))
 over_80_popn <- rowSums(over_80_popn[,c(1,2,3,4,5,6,7,8,9,10,11)])
 
 vacc_over_80 <- read_csv("data/weekly_vax/vaccination_cuml_agesex.csv") %>% 
-  filter(AgeGroup == "80 years of age and over") %>% 
-  filter(Sex == "Female" | Sex == "Male")
+  filter(AgeGroup == "80 years of age and over") 
 
 dose1_over80 <- sum(vacc_over_80$NumberVaccinated)
 #weekly over 80 vax proportion
