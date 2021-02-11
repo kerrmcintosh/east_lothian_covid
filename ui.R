@@ -88,7 +88,7 @@ ui <- fluidPage(
                  fluidRow(
                    column(8,
                    div(class = "about_us",
-                   tags$h6("About This App"),
+                   tags$h6("About This Dashboard"),
                    tags$p("This app has been designed and hard coded using R Shiny to give insight and visualisation into East Lothian data related to Covid-19."),
                    tags$p("The app is updated daily as per Public Health Scotland Data Releases. Daily figures are confirmed cases/deaths/test at the time of writing. 
                           Because of delays in reporting, daily figures will be subject to change.  Data at Local Authority level is released after 3 days. A weekly update of historical figures normally takes place every Tuesday. 

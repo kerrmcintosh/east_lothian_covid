@@ -9,7 +9,7 @@ library(ggiraph)
 library(readxl)
 library(shiny)
 
-weekly_vax_date <- "31/01/2021"
+weekly_vax_date <- "07/02/2021"
 
 # 1 Pull in locality data data
 
@@ -24,6 +24,7 @@ la_data <- read_csv("data/trend_ca.csv") %>%
   select(-c(DailyNegative, CrudeRate7DayPositive)) %>% 
   mutate(Date = ymd(as.character(Date)))
 la_data <- la_data[ -1 ]
+
 #3 Scottish Cumulative Dates - not using
 national_total_data <- read_csv("data/daily_cuml_scot.csv") %>%
   mutate(Date = ymd(as.character(Date)))
@@ -290,14 +291,16 @@ national_total_data <- national_total_data %>%
 
 
 #---------hospitalisation rates ---------------------------------------
-
-
+# x Column `x_i_covid_19_patients_in_icu_or_combined_icu_hdu` doesn't exist.
 
 hospitalisation_data <- hospitalisation_data %>% 
   janitor::clean_names() %>% 
-  rename("icu_covid" = "x_i_covid_19_patients_in_icu_or_combined_icu_hdu" , "all_hospital" = "ii_covid_19_patients_in_hospital_including_those_in_icu" ) %>% 
+  mutate(iii_covid_19_patients_in_icu_or_combined_icu_hdu_with_length_of_stay_more_than_28_days = 
+           ifelse(is.na(iii_covid_19_patients_in_icu_or_combined_icu_hdu_with_length_of_stay_more_than_28_days), 0, iii_covid_19_patients_in_icu_or_combined_icu_hdu_with_length_of_stay_more_than_28_days)) %>% 
+  mutate(icu = x_i_covid_19_patients_in_icu_or_combined_icu_hdu_with_length_of_stay_28_days_or_less + iii_covid_19_patients_in_icu_or_combined_icu_hdu_with_length_of_stay_more_than_28_days) %>% 
+  rename("icu_covid" = "icu" , "all_hospital" = "ii_covid_19_patients_in_hospital_including_those_in_icu_with_length_of_stay_28_days_or_less" ) %>% 
   mutate(date = ymd(as.character(str_sub(reporting_date, 1, 10))))  %>% 
-  filter(date <= app_date) %>% 
+  # filter(date <= app_date) %>% 
   arrange(desc(date)) %>% 
   select(-reporting_date) %>% 
   pivot_longer(cols =c(all_hospital, icu_covid),
@@ -380,4 +383,4 @@ over80_popn <- round((dose1_over80 / over_80_popn)*100, 0)
 elpopn <- 105790
 east_lothian_vax <- read_csv("data/weekly_vax/vaccination_local_authority.csv") %>% 
   filter(CA == "S12000010")
-east_lothian_vax <- round((east_lothian_vax$NumberVaccinated / elpopn)*100, 2)
+east_lothian_vax <- round((east_lothian_vax$NumberVaccinated / elpopn)*100, 1)

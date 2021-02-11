@@ -16,7 +16,7 @@ server <- function(input, output) {
         scale_fill_brewer(palette = "Purples") +
         theme_void() +
         geom_text(x=10, y=30, label="Scatter plot") +
-        labs(title = "Click map for locality info" ,fill = "Infections per 100,000 \n(Crude Rate)") +
+        labs(title = "Hover over map for locality info" ,fill = "Infections per 100,000 \n(Crude Rate)") +
         guides(shape = guide_legend(override.aes = list(size = 1)),
                color = guide_legend(override.aes = list(size = 1))) +
         theme(legend.title = element_text(size = 7), 
@@ -150,7 +150,7 @@ server <- function(input, output) {
     # })
     
     output$scot_cases<- renderText({
-      paste0("<b>New Cases: </b>",prettyNum(978, big.mark=",",scientific=FALSE))
+      paste0("<b>New Cases: </b>",prettyNum(830, big.mark=",",scientific=FALSE))
     })
     
     # output$scot_deaths<- renderText({
@@ -158,7 +158,7 @@ server <- function(input, output) {
     # })
     
     output$scot_deaths<- renderText({
-      paste0("<b>Deaths: </b>", 88)
+      paste0("<b>Deaths: </b>", 48)
     })
     
     # output$scot_tests<- renderText({
@@ -167,7 +167,7 @@ server <- function(input, output) {
     # 
     
     output$scot_tests<- renderText({
-      paste0("<b>Tests: </b>", prettyNum(22807, big.mark=",",scientific=FALSE))
+      paste0("<b>Tests: </b>", prettyNum(24121, big.mark=",",scientific=FALSE))
     })
     
     output$scot_crude<- renderText({
