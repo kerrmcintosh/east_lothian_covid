@@ -30,7 +30,8 @@ server <- function(input, output) {
       map <- girafe_options(map,
                             opts_zoom(min = 0.5, max = 2),
                             opts_tooltip(css = tooltip_css),
-                            opts_sizing(rescale = TRUE, width = .7))
+                            opts_sizing(rescale = TRUE, width = .7),
+                            opts_selection(type = "none"))
       # if( interactive() ) map
       map
   })
@@ -158,7 +159,7 @@ server <- function(input, output) {
     # })
     
     output$scot_deaths<- renderText({
-      paste0("<b>Deaths: </b>", 48)
+      paste0("<b>Deaths: </b>", 67)
     })
     
     # output$scot_tests<- renderText({
@@ -167,7 +168,7 @@ server <- function(input, output) {
     # 
     
     output$scot_tests<- renderText({
-      paste0("<b>Tests: </b>", prettyNum(24121, big.mark=",",scientific=FALSE))
+      paste0("<b>Tests: </b>", prettyNum(19184, big.mark=",",scientific=FALSE))
     })
     
     output$scot_crude<- renderText({
