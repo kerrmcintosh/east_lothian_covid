@@ -6,13 +6,12 @@ ui <- fluidPage(
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
   ),
-  
+  #header
   tags$div( 
-  #or titlePanel("Hello Shiny!")
       tags$h3(class = "head_left", "East Lothian Covid-19 Tracker"), h6(class = "head_right", "Updated: ", Head_title_date)),
      
       tabsetPanel(
-        #tab 1
+        #main tab
         tabPanel("Dashboard", div(class = "separator"),
                  div(class = "mobile", h4(class = "mobile_warning",  "VIEW IN LANDSCAPE MODE for optimum performance")),
                  fluidRow(
@@ -83,7 +82,7 @@ ui <- fluidPage(
                  
           
         ),
-#tab 2
+#about tab
         tabPanel("About", div(class = "separator"),
                  fluidRow(
                    column(8,
@@ -110,6 +109,7 @@ There are 1,279 Intermediate Zones (localities) covering the whole of Scotland."
         div(class="large_div")
         )),
         div(class = "separator"),
+#footer
         tags$footer(class = "footer_text", uiOutput("github"), uiOutput("linkedin"),
                     tags$div(class = "separator"))
             

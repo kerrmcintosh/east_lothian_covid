@@ -34,23 +34,20 @@ hospitalisation_data <- read_excel("data/trends.xlsx", sheet = "Table 2 - Hospit
 #5 Vax Data
 vax_data <- read_excel("data/trends.xlsx", sheet = "Table 10a - Vaccinations", skip = 2) %>% 
   rename("FirstDose" = "Number of people who have received the first dose of the Covid vaccination", "SecondDose" = "Number of people who have received the second dose of the Covid vaccination" )
-#locality data is 3 days behind - so to make sure - using same date
 
+#Scotland data date
 app_date <- la_data %>% 
   select(Date) %>% 
   arrange(desc(Date)) %>% 
   head(1) 
-#Make sure locality data to app date
-# la_data <- la_data %>% 
-#   filter(Date <= app_date)
-
-
 head_date <- app_date$Date %>% 
   format('%d/%m/%y')
 
+#Header Date
 Head_title_date <- today() %>% 
   format('%d %B %Y')
 
+#local authority date
 local_date <- locality_data %>% 
   select(Date) %>% 
   arrange(desc(Date))  %>% 
@@ -62,10 +59,10 @@ local_box_date <- local_date$Date  %>%
 local_date_title <- local_date$Date %>% 
   format('%d %B %Y')
 
-head_date_tile <- local_date_title
+# head_date_tile <- local_date_title
 la_regions <- unique(locality_data$CAName)
 
-
+#Tidy / prep Local Authority Locality Data
 el_data <- locality_data %>% 
   select(-c(Positive7DayQF, CrudeRate7DayPositiveQF)) %>% 
   filter(CAName == "East Lothian") %>%
@@ -103,9 +100,7 @@ tooltip_css <- "background-color:#d9d9d9;
 
 #---------------PLOT 2 ---------------------
 
-
-
-
+#tidy and prep data for total county deaths and cases bar plot
 county_cumulative <- la_data %>%
   filter(CAName == "East Lothian") %>% 
   select(-c(DailyPositive,DailyDeaths, CA, CAName, TotalTests)) %>% 
@@ -119,81 +114,48 @@ county_cumulative <- la_data %>%
 
 #------------------PLOT 3
 
+#KPI prep
+
 totals_data <- la_data  %>% 
   select(-c(CumulativeNegative , CrudeRateNegative, PositiveTests, PositivePercentage7Day, PositivePercentage, TotalPillar1, TotalPillar2, CrudeRateDeaths, CrudeRatePositive))
 
-colnames(locality_data)
+#Local Authority Population
 population <- locality_data %>% 
   filter(Date == local_date) %>% 
   group_by(CAName) %>% 
   summarise(population = sum(Population))
 
+#Scottish Population
 scot_population <- sum(population$population)
 
 total_tests <- sum(totals_data$TotalTests)
 scot_pos <- sum(totals_data$DailyPositive)
 scot_deaths <- sum(totals_data$DailyDeaths)
 
-region_total_crude <- totals_data %>%
-  filter(CAName == "East Lothian") %>% 
-  filter(Date <= local_date) %>% 
-  arrange(desc(Date)) %>% 
-  slice_max(Date, n = 7) %>% 
-  mutate(CAName = as.character(CAName)) 
+#East Lothian last 7 days
 
+region_total_crude <- totals_data %>%
+  filter(CAName == "East Lothian") %>%
+  filter(Date <= local_date) %>%
+  arrange(desc(Date)) %>%
+  slice_max(Date, n = 7) %>%
+  mutate(CAName = as.character(CAName))
+
+#multipliers created with populations to get crude rates
 region_total_crude$CAName = as.character(region_total_crude$CAName)
 region_total_crude <- left_join(region_total_crude, population, by ="CAName")
 region_multiplier <- 100000/head(as.numeric(region_total_crude$population),1)
 
-colnames(totals_data)
-scot_total_crude <- totals_data %>%
-  group_by(Date) %>% 
-  filter(Date <= local_date)  %>% 
-  summarise(DailyPositive = sum(DailyPositive), DailyDeaths = sum(DailyDeaths), TotalTests = sum(TotalTests)) %>% 
-  arrange(desc(Date)) %>% 
-  slice_max(Date, n = 7) 
 
 scot_multiplier <- 100000/head(as.numeric(scot_population),1)
 
-scot_total <- scot_total_crude %>% 
-  slice_max(Date, n = 1) 
 
-el_crude_today <- sum(region_total_crude$DailyPositive) *region_multiplier
-scot_crude_today <- sum(scot_total_crude$DailyPositive) *scot_multiplier
-total_tests_today = sum(la_data$TotalTests)
-#compare with below
-scot_pos_today = sum(la_data$DailyPositive)
-# scot_deaths_today = sum(la_data$DailyDeaths)
-
-crude_check <- locality_data %>% 
-  select(-c(Positive7DayQF, CrudeRate7DayPositiveQF)) %>% 
-  filter(CAName == "East Lothian") %>%
-  filter(Date ==app_date) %>% 
-  rename(InterZone = IntZone) %>% 
-  mutate(CrudeRate7DayPositive = ifelse(is.na(CrudeRate7DayPositive), 0, CrudeRate7DayPositive)) %>% 
-  mutate(multiplier = 100000/Population) %>% 
-  mutate(Positive7Day = ifelse(is.na(Positive7Day), 0, Positive7Day)) %>% 
-  mutate(real_rate_per_OT = round(multiplier*Positive7Day))
-sum(crude_check$Positive7Day)*region_multiplier
-
-#East Lothian Crude Rate 98 as opposed to 
-#---- TEST FINISH!!!! ____
-
-scot_test_data <- la_data %>% 
-  select(Date, TotalTests)  %>% 
-  group_by(Date) %>% 
-  summarize (TotalTests = sum(TotalTests))
-
-
-
-# national_cuml_data <- left_join(national_cuml_data, scot_test_data, by ="Date")
-
-
+# Prep and tidy data for Cases, Deaths and Tests Time Series
 CovidTime <- totals_data %>% 
   select(-c(CA, CumulativeDeaths)) %>% 
   rename(DailyCases = DailyPositive, CumulativeCases = CumulativePositive, Region = CAName, Deaths = DailyDeaths)
 
-colnames(CovidTime)
+# colnames(CovidTime)
 scot_cuml_time <- CovidTime %>% 
   group_by(Date) %>% 
   summarise(DailyCases = sum(DailyCases), Deaths = sum(Deaths), TotalTests = sum(TotalTests), CumulativeCases = sum(CumulativeCases)) %>% 
@@ -219,33 +181,48 @@ CovidTimeLine <-  CovidTime %>%
                names_to = "RollingStats",
                values_to = "RollingNumbers") 
 
-y_la <- list(
-  title = "Daily Cases")
+# y_la <- list(
+#   title = "Daily Cases")
 
-el_daily <- totals_data %>% 
-  filter(Date == local_date) %>%
-  filter(CAName == "East Lothian")
-
-# scot_total <- CovidTime %>% 
-#   mutate(DailyDeaths = Deaths - lag(Deaths,1)) %>% 
-#   filter(Date == app_date) %>%
-#   filter(Region == "Scotland") 
-
-#-------------SCOT STATS _______________
+#------- EL Stats ---------
 totals_data <- la_data  %>% 
   select(-c(CumulativeNegative , CrudeRateNegative, PositiveTests, PositivePercentage7Day, TotalPillar1, TotalPillar2, CrudeRateDeaths, CrudeRatePositive))
 
-colnames(locality_data)
+# colnames(locality_data)
+
 population <- locality_data %>% 
   group_by(CAName) %>% 
   summarise(population = sum(Population))
 
-# scot_population <- sum(population$population)
+#el_daily for daily totals cases, deaths and tests
+el_daily <- totals_data %>% 
+  filter(Date == local_date) %>%
+  filter(CAName == "East Lothian")
+
+# East Lothian data for last 7 days
+region_total_crude <- totals_data %>%
+  filter(CAName == "East Lothian") %>% 
+  filter(Date <= local_date) %>% 
+  arrange(desc(Date)) %>% 
+  slice_max(Date, n = 7) %>% 
+  mutate(CAName = as.character(CAName)) 
+
+#Add populations for crude rate calculation
+region_total_crude$CAName = as.character(region_total_crude$CAName)
+region_total_crude <- left_join(region_total_crude, population, by ="CAName")
+
+#cases in last 7 days
+el_7day <- sum(region_total_crude$DailyPositive)
+
+
+#-------------SCOT STATS _______________
+##### KPIS
 
 total_tests <- sum(totals_data$TotalTests)
 scot_pos <- sum(totals_data$DailyPositive)
 scot_deaths <- sum(totals_data$DailyDeaths)
 
+#not used as daily totals taken manually from PHS which is most up to date
 # totals_data %>% 
 #   group_by(Date) %>%
 #   summarise(D = sum(CumulativeDeaths), C = sum(CumulativePositive)) %>% 
@@ -258,29 +235,20 @@ scot_cumulative <-  totals_data %>%
                values_to = "CumulativeTotals") %>% 
   mutate(Stats =factor(Stats, levels = c("scot_pos", "scot_deaths"))) 
   
-region_total_crude <- totals_data %>%
-  filter(CAName == "East Lothian") %>% 
-  filter(Date <= local_date) %>% 
-  arrange(desc(Date)) %>% 
-  slice_max(Date, n = 7) %>% 
-  mutate(CAName = as.character(CAName)) 
 
-
-region_total_crude$CAName = as.character(region_total_crude$CAName)
-region_total_crude <- left_join(region_total_crude, population, by ="CAName")
 
 # region_multiplier <- 100000/head(as.numeric(region_total_crude$population),1)
+
+# colnames(totals_data)
 scot_total_crude <- totals_data %>%
-  group_by(Date) %>% 
-  summarise(DailyPositive = sum(DailyPositive)) %>% 
-  arrange(desc(Date)) %>% 
-  slice_max(Date, n = 7) 
+  group_by(Date) %>%
+  summarise(DailyPositive = sum(DailyPositive), DailyDeaths = sum(DailyDeaths), TotalTests = sum(TotalTests)) %>%
+  arrange(desc(Date)) %>%
+  slice_max(Date, n = 7)
 
-scot_multiplier <- 100000/head(as.numeric(scot_population),1)
 
-el_7day <- sum(region_total_crude$DailyPositive)
-# el_crude_today <- el_7day *region_multiplier
-# scot_crude_today <- sum(scot_total_crude$DailyPositive) *scot_multiplier
+el_crude_today <- el_7day *region_multiplier
+scot_crude_today <- sum(scot_total_crude$DailyPositive) *scot_multiplier
 total_tests_today = sum(la_data$TotalTests)
 
 national_total_data <- national_total_data %>% 

@@ -7,8 +7,7 @@ server <- function(input, output) {
   })
   
   output$map <- renderGirafe({
-    # react <- ggplot(data[which(data$model==input$plot1_selected),], aes(x=cty)) +
-    #   geom_bar()
+
       gg <- ggplot(el_map) +
         geom_sf_interactive(aes(fill = CrudeRate7DayPositive, 
                                 tooltip = c(paste0(IntZoneName, "\n",real_rate_per_OT,  " infections per 100,000 (Actual rate over previous 7 days) \n", Positive7Day, " infections in last 7 days \n(", abs(wow), " ",change,")")),  
@@ -32,7 +31,6 @@ server <- function(input, output) {
                             opts_tooltip(css = tooltip_css),
                             opts_sizing(rescale = TRUE, width = .7),
                             opts_selection(type = "none"))
-      # if( interactive() ) map
       map
   })
   
@@ -145,13 +143,15 @@ server <- function(input, output) {
     output$el_vax<- renderText({
       paste0(("<b>First Dose Vaccinated: </b>"), east_lothian_vax, "% (weekly statistic as of ", weekly_vax_date, ")")
     })
-  
+# DATA WAS BEING TAKEN FROM PHS DATASET - BUT THE ACTUAL FIGURE LISTED ON PHS DAILY UPDATE IS MORE UP TO DATE (AND
+# so has been manually entered instead)  -  latest daily figure from dataset is often only a 1/3 of PHS dashboard reported daily total
+
     # output$scot_cases<- renderText({
     #   paste0("<b>New Cases: </b>",prettyNum(scot_total$DailyPositive, big.mark=",",scientific=FALSE))
     # })
     
     output$scot_cases<- renderText({
-      paste0("<b>New Cases: </b>",prettyNum(830, big.mark=",",scientific=FALSE))
+      paste0("<b>New Cases: </b>",prettyNum(908, big.mark=",",scientific=FALSE))
     })
     
     # output$scot_deaths<- renderText({
@@ -159,7 +159,7 @@ server <- function(input, output) {
     # })
     
     output$scot_deaths<- renderText({
-      paste0("<b>Deaths: </b>", 67)
+      paste0("<b>Deaths: </b>", 45)
     })
     
     # output$scot_tests<- renderText({
@@ -168,7 +168,7 @@ server <- function(input, output) {
     # 
     
     output$scot_tests<- renderText({
-      paste0("<b>Tests: </b>", prettyNum(19184, big.mark=",",scientific=FALSE))
+      paste0("<b>Tests: </b>", prettyNum(22259, big.mark=",",scientific=FALSE))
     })
     
     output$scot_crude<- renderText({
