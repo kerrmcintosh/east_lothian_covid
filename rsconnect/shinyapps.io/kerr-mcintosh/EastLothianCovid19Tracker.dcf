@@ -5,9 +5,8 @@ account: kerr-mcintosh
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3510879
-bundleId: 4219192
+bundleId: 4262060
 url: https://kerr-mcintosh.shinyapps.io/EastLothianCovid19Tracker/
-when: 1613243845.59268
+when: 1614093562.91775
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: data_check.csv

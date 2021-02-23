@@ -151,7 +151,7 @@ server <- function(input, output) {
     # })
     
     output$scot_cases<- renderText({
-      paste0("<b>New Cases: </b>",prettyNum(908, big.mark=",",scientific=FALSE))
+      paste0("<b>New Cases: </b>",prettyNum(655, big.mark=",",scientific=FALSE))
     })
     
     # output$scot_deaths<- renderText({
@@ -159,7 +159,7 @@ server <- function(input, output) {
     # })
     
     output$scot_deaths<- renderText({
-      paste0("<b>Deaths: </b>", 45)
+      paste0("<b>Deaths: </b>", 56)
     })
     
     # output$scot_tests<- renderText({
@@ -168,7 +168,7 @@ server <- function(input, output) {
     # 
     
     output$scot_tests<- renderText({
-      paste0("<b>Tests: </b>", prettyNum(22259, big.mark=",",scientific=FALSE))
+      paste0("<b>Tests: </b>", prettyNum(16031, big.mark=",",scientific=FALSE))
     })
     
     output$scot_crude<- renderText({
@@ -198,7 +198,7 @@ server <- function(input, output) {
       theme(axis.text.x=element_blank(),
             legend.title = element_blank(),
             legend.position = "top") +
-      geom_text(aes(y = split_numbers/2, label = paste0(split_numbers, " %"))) 
+      geom_text(aes(y = split_numbers - 23.6, label = paste0(split_numbers, " %"))) 
     first_vax_pie
     })
    

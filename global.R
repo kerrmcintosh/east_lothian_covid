@@ -9,7 +9,7 @@ library(ggiraph)
 library(readxl)
 library(shiny)
 
-weekly_vax_date <- "07/02/2021"
+weekly_vax_date <- "14/02/2021"
 
 # 1 Pull in locality data data
 
@@ -17,13 +17,13 @@ weekly_vax_date <- "07/02/2021"
 locality_data <- read_csv("data/trend_iz.csv", 
                           col_types = cols(CrudeRate7DayPositive = col_character(), Positive7Day = col_integer())) %>% 
   mutate(Date = ymd(as.character(Date))) 
-locality_data <- locality_data[ -1 ]
+# locality_data <- locality_data[ -1 ]
 
 # 2 Pull in local authority data data
 la_data <- read_csv("data/trend_ca.csv") %>% 
   select(-c(DailyNegative, CrudeRate7DayPositive)) %>% 
   mutate(Date = ymd(as.character(Date)))
-la_data <- la_data[ -1 ]
+# la_data <- la_data[ -1 ]
 
 #3 Scottish Cumulative Dates - not using
 national_total_data <- read_csv("data/daily_cuml_scot.csv") %>%
@@ -34,6 +34,7 @@ hospitalisation_data <- read_excel("data/trends.xlsx", sheet = "Table 2 - Hospit
 #5 Vax Data
 vax_data <- read_excel("data/trends.xlsx", sheet = "Table 10a - Vaccinations", skip = 2) %>% 
   rename("FirstDose" = "Number of people who have received the first dose of the Covid vaccination", "SecondDose" = "Number of people who have received the second dose of the Covid vaccination" )
+
 
 #Scotland data date
 app_date <- la_data %>% 
@@ -62,7 +63,7 @@ local_date_title <- local_date$Date %>%
 # head_date_tile <- local_date_title
 la_regions <- unique(locality_data$CAName)
 
-#Tidy / prep Local Authority Locality Data
+#Tidy / prep Local Authority Locality Data - treat NA as 0
 el_data <- locality_data %>% 
   select(-c(Positive7DayQF, CrudeRate7DayPositiveQF)) %>% 
   filter(CAName == "East Lothian") %>%
