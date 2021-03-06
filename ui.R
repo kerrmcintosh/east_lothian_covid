@@ -8,7 +8,7 @@ ui <- fluidPage(
   ),
   #header
   tags$div( 
-      tags$h3(class = "head_left", "East Lothian Covid-19 Tracker"), h6(class = "head_right", "Updated: ", Head_title_date)),
+      tags$h3(class = "head_left", "East Lothian Covid-19 Tracker"), h6(class = "head_right", "Updated: ", updated_date)),
      
       tabsetPanel(
         #main tab

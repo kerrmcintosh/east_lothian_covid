@@ -198,7 +198,8 @@ server <- function(input, output) {
       theme(axis.text.x=element_blank(),
             legend.title = element_blank(),
             legend.position = "top") +
-      geom_text(aes(y = split_numbers - 23.6, label = paste0(split_numbers, " %"))) 
+      geom_text(aes(label = paste0(split_numbers, " %")),
+                position = position_stack(vjust = 0.5)) 
     first_vax_pie
     })
    

@@ -1,5 +1,4 @@
 
-# why crude rates for region from IZ and CA dataset different... eg 21/01 cases. Neighbourhood 100, local authority: 111
 
 library(tidyverse)
 library(plotly)
@@ -12,28 +11,28 @@ library(shiny)
 library(httr)
 
 
-
-weekly_vax_date <- "14/02/2021"
+updated_date <- "06/03/2021"
+weekly_vax_date <- "28/02/2021"
 
 # 1 Pull in locality data data
 
 
-locality_data <- read_csv(url("https://www.opendata.nhs.scot/dataset/b318bddf-a4dc-4262-971f-0ba329e09b87/resource/8906de12-f413-4b3f-95a0-11ed15e61773/download/trend_iz_20210223.csv"), 
+locality_data <- read_csv(url("https://www.opendata.nhs.scot/dataset/b318bddf-a4dc-4262-971f-0ba329e09b87/resource/8906de12-f413-4b3f-95a0-11ed15e61773/download/trend_iz_20210306.csv"), 
                           col_types = cols(CrudeRate7DayPositive = col_character(), Positive7Day = col_integer())) %>% 
   mutate(Date = ymd(as.character(Date))) 
 # locality_data <- locality_data[ -1 ]
 
 # 2 Pull in local authority data data
-la_data <- read_csv(url("https://www.opendata.nhs.scot/dataset/b318bddf-a4dc-4262-971f-0ba329e09b87/resource/427f9a25-db22-4014-a3bc-893b68243055/download/trend_ca_20210223.csv")) %>% 
+la_data <- read_csv(url("https://www.opendata.nhs.scot/dataset/b318bddf-a4dc-4262-971f-0ba329e09b87/resource/427f9a25-db22-4014-a3bc-893b68243055/download/trend_ca_20210306.csv")) %>% 
   select(-c(DailyNegative, CrudeRate7DayPositive)) %>% 
   mutate(Date = ymd(as.character(Date)))
 # la_data <- la_data[ -1 ]
 
 #3 Scottish Cumulative Dates - not using
-national_total_data <- read_csv(url("https://www.opendata.nhs.scot/dataset/b318bddf-a4dc-4262-971f-0ba329e09b87/resource/287fc645-4352-4477-9c8c-55bc054b7e76/download/daily_cuml_scot_20210223.csv")) %>%
+national_total_data <- read_csv(url("https://www.opendata.nhs.scot/dataset/b318bddf-a4dc-4262-971f-0ba329e09b87/resource/287fc645-4352-4477-9c8c-55bc054b7e76/download/daily_cuml_scot_20210306.csv")) %>%
   mutate(Date = ymd(as.character(Date)))
 ## Pull in excel from url
-trends_url <-"https://www.gov.scot/binaries/content/documents/govscot/publications/statistics/2020/04/coronavirus-covid-19-trends-in-daily-data/documents/trends-in-number-of-people-in-hospital-with-confirmed-or-suspected-covid-19/trends-in-number-of-people-in-hospital-with-confirmed-or-suspected-covid-19/govscot%3Adocument/COVID-19%2BDaily%2Bdata%2B-%2BTrends%2Bin%2Bdaily%2BCOVID-19%2Bdata%2B-%2B23%2BFebruary%2B2021.xlsx"
+trends_url <-"https://www.gov.scot/binaries/content/documents/govscot/publications/statistics/2020/04/coronavirus-covid-19-trends-in-daily-data/documents/trends-in-number-of-people-in-hospital-with-confirmed-or-suspected-covid-19/trends-in-number-of-people-in-hospital-with-confirmed-or-suspected-covid-19/govscot%3Adocument/COVID-19%2BDaily%2Bdata%2B-%2BTrends%2Bin%2Bdaily%2BCOVID-19%2Bdata%2B-%2B06%2BMarch%2B2021.xlsx"
 GET(trends_url, write_disk(tf <- tempfile()))
 
 #4 Hospital Data
@@ -348,7 +347,7 @@ over_80_popn$x88 = as.numeric(str_remove(over_80_popn$x88, "[,]"))
 
 over_80_popn <- rowSums(over_80_popn[,c(1,2,3,4,5,6,7,8,9,10,11)])
 
-vacc_over_80 <- read_csv(url("https://www.opendata.nhs.scot/dataset/6dbdd466-45e3-4348-9ee3-1eac72b5a592/resource/4c65e4bb-fbd3-46e7-aac7-dcc54f37de65/download/vaccination_cuml_agesex_20210217.csv")) %>% 
+vacc_over_80 <- read_csv(url("https://www.opendata.nhs.scot/dataset/6dbdd466-45e3-4348-9ee3-1eac72b5a592/resource/4c65e4bb-fbd3-46e7-aac7-dcc54f37de65/download/vaccination_cuml_agesex_20210303.csv")) %>% 
   filter(AgeGroup == "80 years of age and over") 
 
 dose1_over80 <- sum(vacc_over_80$NumberVaccinated)
@@ -356,6 +355,6 @@ dose1_over80 <- sum(vacc_over_80$NumberVaccinated)
 over80_popn <- round((dose1_over80 / over_80_popn)*100, 0)
 
 elpopn <- 105790
-east_lothian_vax <- read_csv(url("https://www.opendata.nhs.scot/dataset/6dbdd466-45e3-4348-9ee3-1eac72b5a592/resource/4ec38438-c8b3-4946-9283-ee99f7a86a3b/download/vaccination_cuml_ca_20210217.csv")) %>% 
+east_lothian_vax <- read_csv(url("https://www.opendata.nhs.scot/dataset/6dbdd466-45e3-4348-9ee3-1eac72b5a592/resource/4ec38438-c8b3-4946-9283-ee99f7a86a3b/download/vaccination_cuml_ca_20210303.csv")) %>% 
   filter(CA == "S12000010")
 east_lothian_vax <- round((east_lothian_vax$NumberVaccinated / elpopn)*100, 1)
